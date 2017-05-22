@@ -1,0 +1,6 @@
+bin
+rpm-tmp.*
+rpm/BUILD/*
+rpm/SOURCES/*
+pkg/
+.idea
