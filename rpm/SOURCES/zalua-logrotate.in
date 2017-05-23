@@ -1,0 +1,11 @@
+/var/log/zabbix/zalua.log {
+  daily
+  rotate 7
+  size 10M
+  compress
+  create 0664 zabbix zabbix
+  missingok
+  postrotate
+      rm -f /tmp/zalua-mon.sock
+  endscript
+}

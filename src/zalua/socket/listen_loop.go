@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"zalua/settings"
 )
@@ -23,6 +24,7 @@ func ListenLoop(clientHandle func(net.Conn)) error {
 		return err
 	}
 	result := &server{fd: fd}
+	go result.healthCheck()
 	result.run(clientHandle)
 	return nil
 }
@@ -37,4 +39,17 @@ func (s *server) run(clientHandle func(net.Conn)) {
 		go clientHandle(clientFd)
 	}
 
+}
+
+func (s *server) healthCheck() {
+	healTickChan := time.NewTicker(time.Second).C
+	for {
+		select {
+		case <-healTickChan:
+			if !Alive() {
+				log.Printf("[ERROR] Socket %s is not alive, exiting now...\n", settings.SocketPath())
+				os.Exit(0)
+			}
+		}
+	}
 }
