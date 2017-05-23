@@ -1,0 +1,29 @@
+image: centos:6
+
+types:
+- build
+
+cache:
+  untracked: false
+
+rpm:
+
+  type: build
+
+  script:
+  - echo -e "[wandisco-Git]\nname=CentOS-6 - Wandisco Git\nbaseurl=http://opensource.wandisco.com/centos/6/git/\$basearch/\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/wandisco-git.repo
+  - yum install -y epel-release
+  - yum install -y golang make git gzip rpm-build nc
+  - make docker
+  - rsync -aP /build/RPMS/x86_64/*.rpm rsync://repo6.itv.restr.im/infra/6/x86_64/
+  - echo 'infra/6/x86_64' | nc -w5 repo6.itv.restr.im 8008
+
+  artifacts:
+    paths:
+    - /build/RPMS/x86_64/*.rpm
+
+  tags:
+  - docker
+
+  only:
+  - tags
