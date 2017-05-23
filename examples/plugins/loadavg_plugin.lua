@@ -14,5 +14,9 @@ end
 while true do
   local avg = loadavg()
   metrics.set("system.processes.total", avg.exist)
+--  metrics.set("system.la.1", avg.minute1avg)
+--  metrics.set("system.la.5", avg.minute5avg)
+--  metrics.set("system.la.15", avg.minute15avg)
   metrics.set_counter_speed("system.fork_rate", avg.lastpid)
+  utils.sleep(60)
 end
