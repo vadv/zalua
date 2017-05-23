@@ -28,13 +28,16 @@ make
 rm -f /tmp/%{bin_name}-mon.sock
 
 %install
+# bin
 %{__mkdir} -p %{buildroot}%{restream_zabbix_bin_dir}
-%{__mkdir} -p %{buildroot}/%{_sysconfdir}/logrotate.d
-%{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
-%{__install} -m 0644 examples/config.lua %{buildroot}%{_sysconfdir}/%{bin_name}/config.lua
-%{__install} -m 0644 -p %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{bin_name}
-cp -rva examples/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
 install -m 0755 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
+# logrotate
+%{__mkdir} -p %{buildroot}/%{_sysconfdir}/logrotate.d
+%{__install} -m 0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{bin_name}
+# plugins
+%{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
+cp -rva examples/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
+%{__install} -m 0644 examples/config.lua %{buildroot}%{_sysconfdir}/%{bin_name}/config.lua
 
 %clean
 rm -rf %{buildroot}
@@ -44,4 +47,5 @@ rm -rf %{buildroot}
 %{restream_zabbix_bin_dir}/%{bin_name}
 %{_sysconfdir}/%{bin_name}/config.lua
 %{_sysconfdir}/%{bin_name}/plugins/*
+%{_sysconfdir}/logrotate.d/%{bin_name}
 %doc README.md
