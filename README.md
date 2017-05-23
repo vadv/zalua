@@ -11,11 +11,11 @@
 
 ## Запуск и получение метрик
 
-При запуске проверяется что по сокету /tmp/zalua-mon.sock отвечает сервер на ping-pong сообщение,
+При запуске проверяется что по сокету `/tmp/zalua-mon.sock` отвечает сервер на ping-pong сообщение,
 иначе запускается демон-сервер который начинает слушать этот сокет.
-демон пытает запустить /etc/zalua/config.lua dsl которого описан ниже.
+демон пытает запустить `/etc/zalua/config.lua` dsl которого описан ниже.
 
-### Доступные команды:
+### Доступные команды клиента:
 
 ```
 -v, -version, --version
@@ -33,6 +33,9 @@
 ### Пример вывода:
 
 ```
+$ zalua -p
+/etc/zalua/plugins/disk_plugin.lua
+
 $ zalua -m
 system.disk.discovery           {"data":[{"{#DEV}":"sda"},{"{#DEV}":"sdb"},{"{#DEV}":"sdc"}]}           1495559213
 system.disk.sda.read_bytes              11582.010802            1495559213
@@ -50,6 +53,15 @@ system.disk.sdc.read_ops                23.214414               1495559213
 system.disk.sdc.utilization             2.486211                1495559213
 system.disk.sdc.write_bytes             1411871.836263          1495559213
 system.disk.sdc.write_ops               5.561949                1495559213
+
+$ zalua -g system.disk.sdc.write_ops
+5.561949
+```
+
+### Пример UserParameter:
+
+```
+UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 ```
 
 ## lua-DSL
