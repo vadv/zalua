@@ -24,7 +24,7 @@ var speedCacheLastValue = make(map[string]float64, 0)
 var speedCacheLastTime = make(map[string]int64, 0)
 var speedCacheLock = &sync.Mutex{}
 
-func (c *dslConfig) dslSetSpeed(L *lua.LState) int {
+func setSpeed(L *lua.LState, counter bool) int {
 	speedCacheLock.Lock()
 	defer speedCacheLock.Unlock()
 
@@ -48,17 +48,31 @@ func (c *dslConfig) dslSetSpeed(L *lua.LState) int {
 			L.RaiseError("argument #2 must be string or number")
 		}
 	}
+
 	if lastValue, ok := speedCacheLastValue[metric]; ok {
 		if lastTime, ok := speedCacheLastTime[metric]; ok {
 			now := time.Now().UnixNano()
-			value := float64(time.Second) * float64(val-lastValue) / float64(now-lastTime)
-			storage.Box.Set(metric, strconv.FormatFloat(value, 'f', 6, 64), ttl)
+			diff := float64(val - lastValue)
+			if counter && diff < 0 {
+				// должны пропустить если counter и счетчик провернулся
+			} else {
+				value := float64(time.Second) * diff / float64(now-lastTime)
+				storage.Box.Set(metric, strconv.FormatFloat(value, 'f', 6, 64), ttl)
+			}
 		}
-	} else {
-		speedCacheLastValue[metric] = val
-		speedCacheLastTime[metric] = time.Now().UnixNano()
 	}
+	speedCacheLastValue[metric] = val
+	speedCacheLastTime[metric] = time.Now().UnixNano()
+
 	return 0
+}
+
+func (c *dslConfig) dslStorageSetSpeed(L *lua.LState) int {
+	return setSpeed(L, false)
+}
+
+func (c *dslConfig) dslStorageSetCounterSpeed(L *lua.LState) int {
+	return setSpeed(L, true)
 }
 
 func (c *dslConfig) dslStorageSet(L *lua.LState) int {

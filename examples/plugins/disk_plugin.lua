@@ -1,10 +1,8 @@
 -- парсит содержимое /proc/diskstats
 function diskstat()
-
   local result = {}
   -- https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats
   local pattern = "(%d+)%s+(%d+)%s+(%S+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)"
-
   for line in io.lines("/proc/diskstats") do
     local major, minor, dev_name,
        rd_ios, rd_merges_or_rd_sec, rd_sec_or_wr_ios, rd_ticks_or_wr_sec,
@@ -19,13 +17,11 @@ function diskstat()
       rq_ticks = tonumber(rq_ticks)
     }
   end
-
   return result
 end
 
 -- главный loop
 while true do
-
   local discovery = {}
   for dev_name, values in pairs(diskstat()) do
     -- собираем только sdX
@@ -39,7 +35,5 @@ while true do
     end
   end
   metrics.set("system.disk.discovery", json.encode({data = discovery}))
-
   utils.sleep(60)
-
 end

@@ -20,6 +20,8 @@
 ```
 -v, -version, --version
         Get version
+-k, -kill, --kill, kill
+        Kill server
 -m, -metrics, --list-metrics, metrics
         List of known metrics
 -p, -plugins, --plugins, plugins
@@ -75,6 +77,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *metric*:
     * `metric.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
     * `metric.set_speed(key, val, <ttl>)` тоже самое, но считает скорость измерения
+    * `metric.set_counter_speed(key, val, <ttl>)` тоже самое, но считает только положительную скорость измерения
     * `metric.get(key)` получить значение метрики key
     * `metric.list()` список метрик
     * `metric.delete(key)` удалить значение метрики key

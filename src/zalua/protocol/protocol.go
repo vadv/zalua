@@ -12,4 +12,5 @@ const (
 	UNKNOWN_COMMAND = "unknown-command"
 
 	COMMAND_ERROR = "command-error"
+	COMMAND_KILL  = "command-kill"
 )

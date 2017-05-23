@@ -24,7 +24,8 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("metrics", storage)
 	L.SetField(storage, "get", L.NewFunction(config.dslStorageGet))
 	L.SetField(storage, "set", L.NewFunction(config.dslStorageSet))
-	L.SetField(storage, "set_speed", L.NewFunction(config.dslSetSpeed))
+	L.SetField(storage, "set_speed", L.NewFunction(config.dslStorageSetSpeed))
+	L.SetField(storage, "set_counter_speed", L.NewFunction(config.dslStorageSetCounterSpeed))
 	L.SetField(storage, "list", L.NewFunction(config.dslStorageList))
 	L.SetField(storage, "delete", L.NewFunction(config.dslStorageDelete))
 

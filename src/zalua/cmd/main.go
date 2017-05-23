@@ -20,6 +20,7 @@ func main() {
 	help := func() {
 		fmt.Fprintf(os.Stderr, "%s commands:\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "-v, -version, --version\n\tGet version\n")
+		fmt.Fprintf(os.Stderr, "-k, -kill, --kill, kill \n\tKill server\n")
 		fmt.Fprintf(os.Stderr, "-m, -metrics, --list-metrics, metrics\n\tList of known metrics\n")
 		fmt.Fprintf(os.Stderr, "-p, -plugins, --plugins, plugins\n\tList of running plugins\n")
 		fmt.Fprintf(os.Stderr, "-g, -get, --get, --get-metric, get <metric>\n\tGet metric value\n")
@@ -88,6 +89,9 @@ func main() {
 
 	case "", "-ping", "--ping", "ping":
 		msg = protocol.PING
+
+	case "-k", "-kill", "--kill", "kill":
+		msg = protocol.COMMAND_KILL
 
 	case "-p", "-plugins", "--plugins", "--list-plugins", "plugins":
 		if len(os.Args) != 2 {

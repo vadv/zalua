@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -56,6 +57,11 @@ func ClientHandler(conn net.Conn) {
 	// ping-pong
 	case request == protocol.PING:
 		response = protocol.PONG
+
+	// command-kill
+	case request == protocol.COMMAND_KILL:
+		log.Printf("[FATAL] kill server now!\n")
+		os.Exit(100)
 
 	// list of metrics
 	case request == protocol.LIST_OF_METRICS:
