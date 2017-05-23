@@ -35,7 +35,6 @@ func ClientHandler(conn net.Conn) {
 	}()
 
 	requestId := fmt.Sprintf("request-id-%d", requestId())
-	log.Printf("[INFO] %s: accept\n", requestId)
 
 	buf := make([]byte, settings.MaxSizeRequest())
 	conn.SetReadDeadline(time.Now().Add(settings.TimeoutRead()))
@@ -45,6 +44,11 @@ func ClientHandler(conn net.Conn) {
 		return
 	}
 	request := string(buf[0:n])
+	if request == protocol.COMMAND_SERVER_ID {
+		// чтобы не засорять логи, через health-check проверяем ServerId
+		conn.Write([]byte(settings.ServerId()))
+		return
+	}
 	response := ""
 	log.Printf("[INFO] %s: request: '%s'\n", requestId, request)
 

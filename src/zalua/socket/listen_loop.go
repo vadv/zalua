@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"zalua/protocol"
 	"zalua/settings"
 )
 
@@ -42,12 +43,27 @@ func (s *server) run(clientHandle func(net.Conn)) {
 }
 
 func (s *server) healthCheck() {
+
+	validServerId := func() bool {
+		client, err := GetClient()
+		if err != nil {
+			return false
+		}
+		defer client.Close()
+
+		if response, err := client.SendMessage(protocol.COMMAND_SERVER_ID); err != nil {
+			return false
+		} else {
+			return response == settings.ServerId()
+		}
+	}
+
 	healTickChan := time.NewTicker(time.Second).C
 	for {
 		select {
 		case <-healTickChan:
-			if !Alive() {
-				log.Printf("[ERROR] Socket %s is not alive, exiting now...\n", settings.SocketPath())
+			if !validServerId() {
+				log.Printf("[ERROR] Socket %s is not alive or run with another server, exiting now...\n", settings.SocketPath())
 				os.Exit(0)
 			}
 		}

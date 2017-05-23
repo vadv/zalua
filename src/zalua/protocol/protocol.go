@@ -11,6 +11,7 @@ const (
 	UNKNOWN_METRIC  = "unknown-metric"
 	UNKNOWN_COMMAND = "unknown-command"
 
-	COMMAND_ERROR = "command-error"
-	COMMAND_KILL  = "command-kill"
+	COMMAND_ERROR     = "command-error"
+	COMMAND_KILL      = "command-kill"
+	COMMAND_SERVER_ID = "server-id"
 )
