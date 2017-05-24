@@ -25,7 +25,7 @@ while true do
   local discovery = {}
   for dev_name, values in pairs(diskstat()) do
     -- собираем только sdX
-    if string.match(dev_name, "sd[a-z]+$") then
+    if string.match(dev_name, "^sd[a-z]+$") or string.match(dev_name, "^md%d+$") then
       local discovery_item = {}; discovery_item["{#DEV}"] = dev_name; table.insert(discovery, discovery_item)
       metrics.set_speed("system.disk."..dev_name..".utilization", values.tot_ticks / 10)
       metrics.set_speed("system.disk."..dev_name..".read_bytes", values.rd_sec_or_wr_ios * 512) -- 2.6.32
