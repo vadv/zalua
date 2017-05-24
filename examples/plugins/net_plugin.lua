@@ -22,7 +22,7 @@ while true do
       local discovery_item = {}; discovery_item["{#DEV}"] = interface; table.insert(discovery, discovery_item)
       for _, key in pairs(proc_net_fields) do
         local values = proc_net_field_values(row)
-        metrics.set_speed("system.net."..interface.."."..key, values[key])
+        metrics.set_speed("system.net."..key.."["..interface.."]", values[key])
       end
     end
   end

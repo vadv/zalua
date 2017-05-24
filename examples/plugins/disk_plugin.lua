@@ -27,11 +27,11 @@ while true do
     -- собираем только sdX
     if string.match(dev_name, "^sd[a-z]+$") or string.match(dev_name, "^md%d+$") then
       local discovery_item = {}; discovery_item["{#DEV}"] = dev_name; table.insert(discovery, discovery_item)
-      metrics.set_speed("system.disk."..dev_name..".utilization", values.tot_ticks / 10)
-      metrics.set_speed("system.disk."..dev_name..".read_bytes", values.rd_sec_or_wr_ios * 512) -- 2.6.32
-      metrics.set_speed("system.disk."..dev_name..".read_ops", values.rd_ios)
-      metrics.set_speed("system.disk."..dev_name..".write_bytes", values.wr_sec * 512)
-      metrics.set_speed("system.disk."..dev_name..".write_ops", values.wr_ios)
+      metrics.set_speed("system.disk.utilization["..dev_name.."]", values.tot_ticks / 10)
+      metrics.set_speed("system.disk.read_bytes["..dev_name.."]", values.rd_sec_or_wr_ios * 512) -- 2.6.32
+      metrics.set_speed("system.disk.read_ops["..dev_name.."]", values.rd_ios)
+      metrics.set_speed("system.disk.write_bytes["..dev_name.."]", values.wr_sec * 512)
+      metrics.set_speed("system.disk.write_ops["..dev_name.."]", values.wr_ios)
     end
   end
   metrics.set("system.disk.discovery", json.encode({data = discovery}))
