@@ -28,7 +28,8 @@ func (d *dslConfig) dslFilepathGlob(L *lua.LState) int {
 	pattern := L.CheckString(1)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		L.RaiseError("glob error: %s", err.Error())
+		L.Push(lua.LNil)
+		return 1
 	}
 	result := L.CreateTable(len(files), 0)
 	for _, file := range files {

@@ -11,7 +11,7 @@ end
 
 -- супервизор для плагинов
 while true do
-    utils.sleep(10)
+    utils.sleep(5)
     for _, p in pairs(plugins) do
         local running, err = pcall(function() p:check() end)
         if not running then log.error(err); p:run() end

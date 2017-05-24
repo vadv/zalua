@@ -93,7 +93,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `filepath.base(filename)` порт golang filepath.Base()
     * `filepath.dir(filename)` порт golang filepath.Dir()
     * `filepath.ext(filename)` порт golang filepath.Ext()
-    * `filepath.glob(mask)` порт golang filepath.Glob(), может вызвать ошибку.
+    * `filepath.glob(mask)` порт golang filepath.Glob(), в случае ошибки возращает nil.
+
+* *os*:
+    * `os.stat(filename)` порт golang os.stat возвращает таблицу с полями `{size, is_dir, mod_time}`, в случае ошибки возращает nil.
 
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error

@@ -40,6 +40,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(filepath, "ext", L.NewFunction(config.dslFilepathExt))
 	L.SetField(filepath, "glob", L.NewFunction(config.dslFilepathGlob))
 
+	os := L.NewTypeMetatable("os")
+	L.SetGlobal("os", os)
+	L.SetField(os, "stat", L.NewFunction(config.dslOsStat))
+
 	log := L.NewTypeMetatable("log")
 	L.SetGlobal("log", log)
 	L.SetField(log, "error", L.NewFunction(config.dslLogError))
