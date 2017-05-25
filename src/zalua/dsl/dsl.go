@@ -14,10 +14,11 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("plugin", plugin)
 	L.SetField(plugin, "new", L.NewFunction(config.dslNewPlugin))
 	L.SetField(plugin, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"filename": config.dslPluginFilename,
-		"run":      config.dslPluginRun,
-		"stop":     config.dslPluginStop,
-		"check":    config.dslPluginCheck,
+		"filename":   config.dslPluginFilename,
+		"run":        config.dslPluginRun,
+		"stop":       config.dslPluginStop,
+		"error":      config.dslPluginError,
+		"is_running": config.dslPluginIsRunning,
 	}))
 
 	storage := L.NewTypeMetatable("metrics")
@@ -43,6 +44,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	os := L.NewTypeMetatable("os")
 	L.SetGlobal("os", os)
 	L.SetField(os, "stat", L.NewFunction(config.dslOsStat))
+	L.SetField(os, "pagesize", L.NewFunction(config.dslOsPagesize))
 
 	log := L.NewTypeMetatable("log")
 	L.SetGlobal("log", log)

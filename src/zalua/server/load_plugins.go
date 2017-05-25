@@ -11,14 +11,14 @@ import (
 	"zalua/settings"
 )
 
-func LoadPlugins() {
-	go loadPlugins()
+func LoadConfig() {
+	go loadConfig()
 	time.Sleep(100 * time.Millisecond)
 	log.Printf("[INFO] Plugins loaded\n")
 }
 
 // сама конструкция подразумевает что нам не нужен супервизор
-func loadPlugins() {
+func loadConfig() {
 	log.Printf("[INFO] Load settings file %s\n", settings.PluginConfigPath())
 	state := lua.NewState()
 	dsl.Register(dsl.NewConfig(), state)

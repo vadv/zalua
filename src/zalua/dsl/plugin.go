@@ -1,32 +1,49 @@
 package dsl
 
 import (
+	"fmt"
 	"log"
+	"strings"
 	"sync"
+	"time"
 
 	lua "github.com/yuin/gopher-lua"
 )
 
-var pluginsStates = make(map[string]*lua.LState, 0)
-var pluginsErrors = make(map[string]error, 0)
-var pluginsLock = &sync.Mutex{}
+type plugin struct {
+	sync.Mutex
+	state       *lua.LState
+	filename    string
+	startedAt   int64
+	completedAt int64
+	running     bool
+	lastErr     error
+}
 
-// список запущенных плагинов
-func ListOfPlugins() []string {
-	pluginsLock.Lock()
-	defer pluginsLock.Unlock()
+type plugins struct {
+	sync.Mutex
+	list map[string]*plugin
+}
 
-	result := make([]string, 0)
-	for file, _ := range pluginsStates {
-		result = append(result, file)
+func (l *plugins) insertPlugin(p *plugin) {
+	l.Lock()
+	defer l.Unlock()
+	l.list[p.getFilename()] = p
+}
+
+func (l *plugins) allPlugins() []*plugin {
+	l.Lock()
+	defer l.Unlock()
+	result := make([]*plugin, 0)
+	for _, p := range l.list {
+		result = append(result, p)
 	}
 	return result
 }
 
-type plugin struct {
-	filename string
-}
+var allPlugins = &plugins{list: make(map[string]*plugin)}
 
+// получение плагина из lua-state
 func checkPlugin(L *lua.LState) *plugin {
 	ud := L.CheckUserData(1)
 	if v, ok := ud.Value.(*plugin); ok {
@@ -34,6 +51,43 @@ func checkPlugin(L *lua.LState) *plugin {
 	}
 	L.ArgError(1, "plugin expected")
 	return nil
+}
+
+// получение последней ошибки
+func (p *plugin) getLastError() error {
+	p.Lock()
+	defer p.Unlock()
+	return p.lastErr
+}
+
+// получение статуса - запущено или нет
+func (p *plugin) getIsRunning() bool {
+	p.Lock()
+	defer p.Unlock()
+	return p.running
+}
+
+// получение файла - запущено или нет
+func (p *plugin) getFilename() string {
+	p.Lock()
+	defer p.Unlock()
+	return p.filename
+}
+
+// запуск плагина
+func (p *plugin) start() {
+	p.Lock()
+	state := lua.NewState()
+	Register(NewConfig(), state)
+	p.state = state
+	p.lastErr = nil
+	p.startedAt = time.Now().Unix()
+	p.running = true
+	p.Unlock()
+
+	p.lastErr = p.state.DoFile(p.getFilename())
+	p.running = false
+	p.completedAt = time.Now().Unix()
 }
 
 // создание плагина
@@ -44,78 +98,62 @@ func (c *dslConfig) dslNewPlugin(L *lua.LState) int {
 	L.SetMetatable(ud, L.GetTypeMetatable("plugin"))
 	L.Push(ud)
 	log.Printf("[INFO] Load new plugin `%s`\n", p.filename)
+	allPlugins.insertPlugin(p)
 	return 1
 }
 
 // получение file name плагина
 func (c *dslConfig) dslPluginFilename(L *lua.LState) int {
 	p := checkPlugin(L)
-	L.Push(lua.LString(p.filename))
+	L.Push(lua.LString(p.getFilename()))
 	return 1
 }
 
 // запуск плагина в отдельном стейте
 func (c *dslConfig) dslPluginRun(L *lua.LState) int {
 	p := checkPlugin(L)
-	go pluginStart(p.filename)
+	go p.start()
 
 	return 0
 }
 
-// получение последней ошибки
-func (c *dslConfig) dslPluginCheck(L *lua.LState) int {
-	pluginsLock.Lock()
-	defer pluginsLock.Unlock()
-
+// получение ошибки
+func (c *dslConfig) dslPluginError(L *lua.LState) int {
 	p := checkPlugin(L)
-	filename := p.filename
+	err := p.getLastError()
+	if err == nil {
+		L.Push(lua.LNil)
+	} else {
+		L.Push(lua.LString(err.Error()))
+	}
+	return 1
+}
 
-	_, found := pluginsStates[filename]
-	if !found {
-		L.RaiseError("plugin '%s' is not started", filename)
-		return 0
-	}
-	err, ok := pluginsErrors[filename]
-	if !ok {
-		L.RaiseError("plugin '%s' is not activated", filename)
-		return 0
-	}
-	if err != nil {
-		L.RaiseError(err.Error())
-		return 0
-	}
-	L.Push(lua.LNil)
+// получение статуса запущен или нет
+func (c *dslConfig) dslPluginIsRunning(L *lua.LState) int {
+	p := checkPlugin(L)
+	L.Push(lua.LBool(p.getIsRunning()))
 	return 1
 }
 
 // остановка плагина
 func (c *dslConfig) dslPluginStop(L *lua.LState) int {
-	pluginsLock.Lock()
-	defer pluginsLock.Unlock()
-
 	p := checkPlugin(L)
-	filename := p.filename
-
-	state, found := pluginsStates[filename]
-	if !found {
-		L.RaiseError("plugin '%s' is not started", filename)
-		return 0
-	}
-
-	state.RaiseError("stop")
-	defer state.Close()
-
-	delete(pluginsStates, filename)
-	delete(pluginsErrors, filename)
+	p.state.RaiseError("stop")
 	return 0
 }
 
-func pluginStart(filename string) {
-	pluginsLock.Lock()
-	state := lua.NewState()
-	Register(NewConfig(), state)
-	pluginsStates[filename] = state
-	pluginsErrors[filename] = nil
-	pluginsLock.Unlock()
-	pluginsErrors[filename] = state.DoFile(filename)
+// список все плагинов
+func ListOfPlugins() []string {
+	result := []string{}
+	for _, p := range allPlugins.allPlugins() {
+		err := p.getLastError()
+		errStr := "<no error>"
+		if err != nil {
+			errStr = fmt.Sprintf("%s", err.Error())
+			errStr = strings.TrimSpace(errStr)
+		}
+		result = append(result, fmt.Sprintf("%s\t\t%t\t\t%v", p.getFilename(), p.getIsRunning(), errStr))
+	}
+	return result
 }

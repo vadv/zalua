@@ -20,3 +20,8 @@ func (d *dslConfig) dslOsStat(L *lua.LState) int {
 	L.Push(result)
 	return 1
 }
+
+func (d *dslConfig) dslOsPagesize(L *lua.LState) int {
+	L.Push(lua.LNumber(os.Getpagesize()))
+	return 1
+}

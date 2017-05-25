@@ -70,9 +70,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 * *plugin*:
     * `p = plugin.new(filename)` создать плагин
-    * `p.run()` запустить
-    * `p.check()` вернет ошибку если плагин не запущен или завершился с ошибкой
-    * `p.stop()` остановить
+    * `p:run()` запустить плагин
+    * `p:stop()` остановить вызвав ошибку stop в плагине
+    * `p:is_running()` запущен или нет плагин
+    * `p:error()` текст последний ошибки или nil
 
 * *metric*:
     * `metric.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
@@ -96,7 +97,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `filepath.glob(mask)` порт golang filepath.Glob(), в случае ошибки возращает nil.
 
 * *os*:
-    * `os.stat(filename)` порт golang os.stat возвращает таблицу с полями `{size, is_dir, mod_time}`, в случае ошибки возращает nil.
+    * `os.stat(filename)` os.stat возвращает таблицу с полями `{size, is_dir, mod_time}`, в случае ошибки возращает nil.
+    * `os.pagesize()` возвращет pagesize
 
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error
