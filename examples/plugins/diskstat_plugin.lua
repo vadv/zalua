@@ -20,12 +20,13 @@ function diskstat()
   return result
 end
 
--- /dev/sda => mountpoint
+-- /dev/sda => mountpoint, /dev/mapper/vg0-lv_slashroot => /
 -- мы ищем только прямое совпадение!
-function get_mountpoint_from_mounts(dev)
+function get_mountpoint_from_mounts(full_dev_name)
   for line in io.lines("/proc/mounts") do
-    local mountpoint = line:match("^"..dev.."%s+(%S+)%s+")
-    if mountpoint return mountpoint end
+    local reg_full_dev_name = full_dev_name:gsub("%-", "%S")
+    local mountpoint = line:match("^"..reg_full_dev_name.."%s+(%S+)%s+")
+    if mountpoint then return mountpoint end
   end
 end
 
@@ -38,8 +39,8 @@ end
 
 -- dm-X => mountpoint
 function dm_mountpoint(dmX)
-  local name = ioutil.readfile("/sys/block/"..dmX.."/dm/name")
-  if not name return nil end
+  local name = ioutil.readfile("/sys/block/"..dmX.."/dm/name"):gsub("^%s+", ""):gsub("%s+$", "")
+  if not name then return nil end
   return get_mountpoint_from_mounts("/dev/mapper/"..name)
 end
 
@@ -57,14 +58,15 @@ end
 
 -- mdX => raid0, raid1, ...
 function md_level(mdX)
-  local level = ioutil.readfile("/sys/block/"..mdX.."/md/level")
+  return ioutil.readfile("/sys/block/"..mdX.."/md/level"):gsub("^%s+", ""):gsub("%s+$", "")
 end
 
 -- mdX => {sda = X, dm-0 = Y}
 function md_device_sizes(mdX)
   local result = {}
-  for _, dev in pairs(filepath.glob("/sys/block/"..mdX.."/slaves/*")) do
-    result[dev] = tonumber(ioutil.readfile("/sys/block/"..mdX.."/slaves/"..dev.."/size"))
+  for _, path in pairs(filepath.glob("/sys/block/"..mdX.."/slaves/*")) do
+    local dev = path:match("/sys/block/"..mdX.."/slaves/(%S+)$")
+    result[dev] = tonumber(ioutil.readfile(path.."/size"))
   end
   return result
 end
@@ -74,7 +76,7 @@ while true do
 
   local devices_info, all_stats = {}, {}
   for dev, values in pairs(diskstat()) do
-    if dev:match("^sd[a-z]+$") or dev:match("^md%d+$") or dev:match("^dm-%d+$") then
+    if dev:match("^sd") or dev:match("^md") or dev:match("^dm") then
       local mountpoint = get_mountpoint_by_dev(dev)
       -- запоминаем только те, по которым мы нашли mountpoint
       if mountpoint then devices_info[dev] = {}; devices_info[dev]["mountpoint"] = mountpoint; end
@@ -87,15 +89,21 @@ while true do
     end
   end
 
+  local discovery = {}
   -- теперь пришло время отослать собранные данные
   for dev, info in pairs(devices_info) do
+
+    local mountpoint = info["mountpoint"]
+    local discovery_item = {}; discovery_item["{#MOUNTPOINT}"] = mountpoint; table.insert(discovery, discovery_item)
+    local utilization = 0
+
     if dev:match("sd") or dev:match("dm") then
-      metrics.set_speed("system.disk.utilization["..dev.."]", all_stats[dev]["utilization"])
+      metrics.set_speed("system.disk.utilization["..mountpoint.."]", all_stats[dev]["utilization"])
     end
+
     -- а вот с md пошло шульмование про utilization
     if dev:match("md") then
       local slaves_info = md_device_sizes(dev)
-      local utilization = 0
 
       -- для raid0 просто суммируем все данные
       if md_level(dev) == "raid0" then
@@ -104,7 +112,7 @@ while true do
 
       -- для raid1 просчитываем utilization с весом
       -- вес высчитывается = (размер slave) / (сумму размера slave-устройств)
-      if md_level(dev) == "raid0" then
+      if md_level(dev) == "raid1" then
         local total_size = 0; for _, size in pairs(slaves_info) do total_size = total_size + size end
         for slave, size in pairs(slaves_info) do
           local weight = size / total_size
@@ -112,12 +120,14 @@ while true do
         end
       end
 
-      metrics.set_speed("system.disk.utilization["..dev.."]", utilization)
+      metrics.set_speed("system.disk.utilization["..mountpoint.."]", utilization)
     end
-    metrics.set_speed("system.disk.read_bytes["..dev.."]", all_stats[dev]["read_bytes"])
-    metrics.set_speed("system.disk.read_ops["..dev.."]", all_stats[dev]["read_ops"])
-    metrics.set_speed("system.disk.write_bytes["..dev.."]", all_stats[dev]["write_bytes"])
-    metrics.set_speed("system.disk.write_ops["..dev.."]", all_stats[dev]["write_ops"])
+
+    -- остсылем все остальные метрики
+    metrics.set_speed("system.disk.read_bytes["..mountpoint.."]", all_stats[dev]["read_bytes"])
+    metrics.set_speed("system.disk.read_ops["..mountpoint.."]", all_stats[dev]["read_ops"])
+    metrics.set_speed("system.disk.write_bytes["..mountpoint.."]", all_stats[dev]["write_bytes"])
+    metrics.set_speed("system.disk.write_ops["..mountpoint.."]", all_stats[dev]["write_ops"])
   end
 
   metrics.set("system.disk.discovery", json.encode({data = discovery}))

@@ -47,6 +47,11 @@ system.tcp.established          1.000000                1495702422
 system.tcp.failed               0.000000                1495702422
 system.tcp.passive              0.000000                1495702422
 system.tcp.resets               0.000000                1495702422
+system.disk.read_bytes[/video]          23454385.653432         1495748781
+system.disk.read_ops[/video]            46.463452               1495748781
+system.disk.utilization[/video]         51.029993               1495748781
+system.disk.write_bytes[/video]         6872556.411429          1495748781
+system.disk.write_ops[/video]           25.724433               1495748781
 
 $ zalua -g system.tcp.active
 0.000000
