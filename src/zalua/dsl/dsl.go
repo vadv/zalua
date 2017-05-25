@@ -34,6 +34,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("utils", utils)
 	L.SetField(utils, "sleep", L.NewFunction(config.dslSleep))
 
+	ioutil := L.NewTypeMetatable("ioutil")
+	L.SetGlobal("ioutil", ioutil)
+	L.SetField(ioutil, "readfile", L.NewFunction(config.dslIoutilReadFile))
+
 	filepath := L.NewTypeMetatable("filepath")
 	L.SetGlobal("filepath", filepath)
 	L.SetField(filepath, "base", L.NewFunction(config.dslFilepathBasename))

@@ -78,6 +78,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *utils*:
     * `utils.sleep(N)` проспать N секунд
 
+* *ioutil*:
+    * `ioutil.readfile(filename)` вернуть содержимое файла
+
 * *json*:
     * `json.encode(N)` lua-table в string
     * `json.decode(N)` string в lua-table

@@ -1,0 +1,125 @@
+-- парсит содержимое /proc/diskstats
+function diskstat()
+  local result = {}
+  -- https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats
+  local pattern = "(%d+)%s+(%d+)%s+(%S+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)"
+  for line in io.lines("/proc/diskstats") do
+    local major, minor, dev_name,
+       rd_ios, rd_merges_or_rd_sec, rd_sec_or_wr_ios, rd_ticks_or_wr_sec,
+       wr_ios, wr_merges, wr_sec, wr_ticks, ios_pgr, tot_ticks, rq_ticks = line:match(pattern)
+    result[dev_name] = {
+      major = tonumber(major), minor = tonumber(minor),
+      rd_ios = tonumber(rd_ios), rd_merges_or_rd_sec = tonumber(rd_merges_or_rd_sec),
+      rd_sec_or_wr_ios = tonumber(rd_sec_or_wr_ios), rd_ticks_or_wr_sec = tonumber(rd_ticks_or_wr_sec),
+      wr_ios = tonumber(wr_ios), wr_merges = tonumber(wr_merges),
+      wr_sec = tonumber(wr_sec), wr_ticks = tonumber(wr_ticks),
+      ios_pgr = tonumber(ios_pgr), tot_ticks = tonumber(tot_ticks),
+      rq_ticks = tonumber(rq_ticks)
+    }
+  end
+  return result
+end
+
+-- /dev/sda => mountpoint
+-- мы ищем только прямое совпадение!
+function get_mountpoint_from_mounts(dev)
+  for line in io.lines("/proc/mounts") do
+    local mountpoint = line:match("^"..dev.."%s+(%S+)%s+")
+    if mountpoint return mountpoint end
+  end
+end
+
+-- sdXD => mountpoint
+function sd_mountpoint(sdX)
+  -- нет задачи получить lvm, или md - мы это определяем ниже,
+  -- тут мы ловим только напрямую подмонтированные
+  return get_mountpoint_from_mounts("/dev/"..sdX)
+end
+
+-- dm-X => mountpoint
+function dm_mountpoint(dmX)
+  local name = ioutil.readfile("/sys/block/"..dmX.."/dm/name")
+  if not name return nil end
+  return get_mountpoint_from_mounts("/dev/mapper/"..name)
+end
+
+-- mdX => mountpoint
+function md_mountpoint(mdX)
+  return get_mountpoint_from_mounts("/dev/"..mdX)
+end
+
+-- sd, md, dm => mountpoint
+function get_mountpoint_by_dev(dev)
+  if dev:match("^sd") then return sd_mountpoint(dev) end
+  if dev:match("^dm") then return dm_mountpoint(dev) end
+  if dev:match("^md") then return md_mountpoint(dev) end
+end
+
+-- mdX => raid0, raid1, ...
+function md_level(mdX)
+  local level = ioutil.readfile("/sys/block/"..mdX.."/md/level")
+end
+
+-- mdX => {sda = X, dm-0 = Y}
+function md_device_sizes(mdX)
+  local result = {}
+  for _, dev in pairs(filepath.glob("/sys/block/"..mdX.."/slaves/*")) do
+    result[dev] = tonumber(ioutil.readfile("/sys/block/"..mdX.."/slaves/"..dev.."/size"))
+  end
+  return result
+end
+
+-- главный loop
+while true do
+
+  local devices_info, all_stats = {}, {}
+  for dev, values in pairs(diskstat()) do
+    if dev:match("^sd[a-z]+$") or dev:match("^md%d+$") or dev:match("^dm-%d+$") then
+      local mountpoint = get_mountpoint_by_dev(dev)
+      -- запоминаем только те, по которым мы нашли mountpoint
+      if mountpoint then devices_info[dev] = {}; devices_info[dev]["mountpoint"] = mountpoint; end
+      -- all stats мы заполняем для всех устройств, так как будет некое шульмование с mdX
+      all_stats[dev] = {
+        utilization = values.tot_ticks / 10, read_bytes = values.rd_sec_or_wr_ios * 512,
+        read_ops = values.rd_ios, write_bytes = values.wr_sec * 512,
+        write_ops = values.wr_ios
+      }
+    end
+  end
+
+  -- теперь пришло время отослать собранные данные
+  for dev, info in pairs(devices_info) do
+    if dev:match("sd") or dev:match("dm") then
+      metrics.set_speed("system.disk.utilization["..dev.."]", all_stats[dev]["utilization"])
+    end
+    -- а вот с md пошло шульмование про utilization
+    if dev:match("md") then
+      local slaves_info = md_device_sizes(dev)
+      local utilization = 0
+
+      -- для raid0 просто суммируем все данные
+      if md_level(dev) == "raid0" then
+        for slave, _ in pairs(slaves_info) do utilization = utilization + all_stats[slave]["utilization"] end
+      end
+
+      -- для raid1 просчитываем utilization с весом
+      -- вес высчитывается = (размер slave) / (сумму размера slave-устройств)
+      if md_level(dev) == "raid0" then
+        local total_size = 0; for _, size in pairs(slaves_info) do total_size = total_size + size end
+        for slave, size in pairs(slaves_info) do
+          local weight = size / total_size
+          utilization = utilization + (all_stats[slave]["utilization"] * weight)
+        end
+      end
+
+      metrics.set_speed("system.disk.utilization["..dev.."]", utilization)
+    end
+    metrics.set_speed("system.disk.read_bytes["..dev.."]", all_stats[dev]["read_bytes"])
+    metrics.set_speed("system.disk.read_ops["..dev.."]", all_stats[dev]["read_ops"])
+    metrics.set_speed("system.disk.write_bytes["..dev.."]", all_stats[dev]["write_bytes"])
+    metrics.set_speed("system.disk.write_ops["..dev.."]", all_stats[dev]["write_ops"])
+  end
+
+  metrics.set("system.disk.discovery", json.encode({data = discovery}))
+  utils.sleep(60)
+end
