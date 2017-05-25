@@ -36,28 +36,20 @@
 
 ```
 $ zalua -p
-/etc/zalua/plugins/disk_plugin.lua
+/etc/zalua/plugins/buddyinfo_plugin.lua         false           /etc/zalua/plugins/buddyinfo_plugin.lua at 1: parse error
+/etc/zalua/plugins/numa_plugin.lua              false           <no error>
+/etc/zalua/plugins/snmp_plugin.lua              true            <no error>
+
 
 $ zalua -m
-system.disk.discovery           {"data":[{"{#DEV}":"sda"},{"{#DEV}":"sdb"},{"{#DEV}":"sdc"}]}           1495559213
-system.disk.sda.read_bytes              11582.010802            1495559213
-system.disk.sda.read_ops                0.784406                1495559213
-system.disk.sda.utilization             0.470755                1495559213
-system.disk.sda.write_bytes             123693.144210           1495559213
-system.disk.sda.write_ops               3.078738                1495559213
-system.disk.sdb.read_bytes              1481291.405964          1495559213
-system.disk.sdb.read_ops                23.665508               1495559213
-system.disk.sdb.utilization             2.568763                1495559213
-system.disk.sdb.write_bytes             1412481.968397          1495559213
-system.disk.sdb.write_ops               5.769718                1495559213
-system.disk.sdc.read_bytes              1474332.771937          1495559213
-system.disk.sdc.read_ops                23.214414               1495559213
-system.disk.sdc.utilization             2.486211                1495559213
-system.disk.sdc.write_bytes             1411871.836263          1495559213
-system.disk.sdc.write_ops               5.561949                1495559213
+system.tcp.active               0.000000                1495702422
+system.tcp.established          1.000000                1495702422
+system.tcp.failed               0.000000                1495702422
+system.tcp.passive              0.000000                1495702422
+system.tcp.resets               0.000000                1495702422
 
-$ zalua -g system.disk.sdc.write_ops
-5.561949
+$ zalua -g system.tcp.active
+0.000000
 ```
 
 ### Пример UserParameter:
