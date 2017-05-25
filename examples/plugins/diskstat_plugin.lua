@@ -107,7 +107,12 @@ while true do
 
       -- для raid0 просто суммируем все данные
       if md_level(dev) == "raid0" then
-        for slave, _ in pairs(slaves_info) do utilization = utilization + all_stats[slave]["utilization"] end
+        local total_slaves = 0
+        for slave, _ in pairs(slaves_info) do
+          utilization = utilization + all_stats[slave]["utilization"]
+          total_slaves = total_slaves + 1
+        end
+        utilization = utilization / total_slaves
       end
 
       -- для raid1 просчитываем utilization с весом
