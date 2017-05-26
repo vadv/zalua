@@ -5,8 +5,8 @@ function diskstat()
   local pattern = "(%d+)%s+(%d+)%s+(%S+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+(%d+)"
   for line in io.lines("/proc/diskstats") do
     local major, minor, dev_name,
-       rd_ios, rd_merges_or_rd_sec, rd_sec_or_wr_ios, rd_ticks_or_wr_sec,
-       wr_ios, wr_merges, wr_sec, wr_ticks, ios_pgr, tot_ticks, rq_ticks = line:match(pattern)
+      rd_ios, rd_merges_or_rd_sec, rd_sec_or_wr_ios, rd_ticks_or_wr_sec,
+      wr_ios, wr_merges, wr_sec, wr_ticks, ios_pgr, tot_ticks, rq_ticks = line:match(pattern)
     result[dev_name] = {
       major = tonumber(major), minor = tonumber(minor),
       rd_ios = tonumber(rd_ios), rd_merges_or_rd_sec = tonumber(rd_merges_or_rd_sec),
@@ -71,6 +71,28 @@ function md_device_sizes(mdX)
   return result
 end
 
+-- вычисляем значения которые зависят от предыдущих значений
+calc_values = {}
+function calc_value(dev, values)
+  if calc_values[dev] == nil then calc_values[dev] = {} end
+  if calc_values[dev]["data"] == nil then calc_values[dev]["data"] = {} end
+  -- проставляем при первом проходе previous
+  if calc_values[dev]["data"]["previous"] == nil then calc_values[dev]["data"]["previous"] = values; return; end
+
+  local previous, current = calc_values[dev]["data"]["previous"], values
+
+  -- вычисляем await https://github.com/sysstat/sysstat/blob/v11.5.6/common.c#L816
+  local delimeter = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
+  if not (delimeter == 0) then
+    calc_values[dev]["await"] = ((current.rd_ticks_or_wr_sec - previous.rd_ticks_or_wr_sec) + (current.wr_ticks - previous.wr_ticks)) / (delimeter)
+  else
+    calc_values[dev]["await"] = 0
+  end
+
+  -- перетираем предыдущее значение
+  calc_values[dev]["data"]["previous"] = values
+end
+
 -- главный loop
 while true do
 
@@ -82,10 +104,11 @@ while true do
       if mountpoint then devices_info[dev] = {}; devices_info[dev]["mountpoint"] = mountpoint; end
       -- all stats мы заполняем для всех устройств, так как будет некое шульмование с mdX
       all_stats[dev] = {
-        utilization = values.tot_ticks / 10, read_bytes = values.rd_sec_or_wr_ios * 512,
-        read_ops = values.rd_ios, write_bytes = values.wr_sec * 512,
-        write_ops = values.wr_ios
+        utilization = values.tot_ticks / 10,
+        read_bytes = values.rd_sec_or_wr_ios * 512, read_ops = values.rd_ios,
+        write_bytes = values.wr_sec * 512, write_ops = values.wr_ios
       }
+      calc_value(dev, values)
     end
   end
 
@@ -95,14 +118,15 @@ while true do
 
     local mountpoint = info["mountpoint"]
     local discovery_item = {}; discovery_item["{#MOUNTPOINT}"] = mountpoint; table.insert(discovery, discovery_item)
-    local utilization = 0
+    local utilization, await = 0, nil
 
-    if dev:match("sd") or dev:match("dm") then
-      metrics.set_speed("system.disk.utilization["..mountpoint.."]", all_stats[dev]["utilization"])
+    if dev:match("^sd") or dev:match("^dm") then
+      utilization = all_stats[dev]["utilization"]
+      await = calc_values[dev]["await"]
     end
 
     -- а вот с md пошло шульмование про utilization
-    if dev:match("md") then
+    if dev:match("^md") then
       local slaves_info = md_device_sizes(dev)
       local total_slave_size = 0; for _, size in pairs(slaves_info) do total_slave_size = total_slave_size + size end
       local raid_level = md_level(dev)
@@ -113,11 +137,18 @@ while true do
         for slave, size in pairs(slaves_info) do
           local weight = size / total_slave_size
           utilization = utilization + (all_stats[slave]["utilization"] * weight)
+
+          local slave_await = calc_values[slave]["await"]
+          if slave_await then
+            if await == nil then await = 0 end
+            await = await + (slave_await * weight)
+          end
         end
       end
-
-      metrics.set_speed("system.disk.utilization["..mountpoint.."]", utilization)
     end
+
+    metrics.set_speed("system.disk.utilization["..mountpoint.."]", utilization)
+    if await then metrics.set("system.disk.await["..mountpoint.."]", await) end
 
     -- остсылем все остальные метрики
     metrics.set_speed("system.disk.read_bytes_in_sec["..mountpoint.."]", all_stats[dev]["read_bytes"])
