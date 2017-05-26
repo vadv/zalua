@@ -48,7 +48,8 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{restream_zabbix_bin_dir}/%{bin_name}
-%{_sysconfdir}/%{bin_name}/config.lua
+%{_sysconfdir}/%{bin_name}/init.lua
 %{_sysconfdir}/%{bin_name}/plugins/*
 %{_sysconfdir}/logrotate.d/%{bin_name}
+%{_sysconfdir}/zabbix/zabbix.d/%{bin_name}_default.conf
 %doc README.md
