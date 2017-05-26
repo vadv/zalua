@@ -8,7 +8,7 @@ import (
 
 var (
 	socketPath = "/tmp/zalua-mon.sock"
-	initPath   = "/etc/zalua/config.lua"
+	initPath   = "/etc/zalua/init.lua"
 
 	logPath                 = "/var/log/zabbix/zalua.log"
 	storagePath             = "/tmp/zalua-storage.json"
