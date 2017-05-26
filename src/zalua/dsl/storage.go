@@ -57,7 +57,7 @@ func setSpeed(L *lua.LState, counter bool) int {
 				// должны пропустить если counter и счетчик провернулся
 			} else {
 				value := float64(time.Second) * diff / float64(now-lastTime)
-				storage.Box.Set(metric, strconv.FormatFloat(value, 'f', 6, 64), ttl)
+				storage.Box.Set(metric, strconv.FormatFloat(value, 'f', 2, 64), ttl)
 			}
 		}
 	}
