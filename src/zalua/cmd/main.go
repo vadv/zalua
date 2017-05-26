@@ -65,7 +65,7 @@ func main() {
 		log.Printf("[INFO] Start server\n")
 
 		// мы должны запустить сервис
-		server.LoadConfig()
+		server.DoInit()
 		if err := socket.ListenLoop(server.ClientHandler); err != nil {
 			log.Printf("[FATAL] Listen server: %s\n", err.Error())
 		}

@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	socketPath       = "/tmp/zalua-mon.sock"
-	pluginConfigPath = "/etc/zalua/config.lua"
+	socketPath = "/tmp/zalua-mon.sock"
+	initPath   = "/etc/zalua/config.lua"
 
 	logPath                 = "/var/log/zabbix/zalua.log"
 	storagePath             = "/tmp/zalua-storage.json"
@@ -23,8 +23,8 @@ func SocketPath() string {
 }
 
 // путь до плагинов
-func PluginConfigPath() string {
-	return pluginConfigPath
+func InitPath() string {
+	return initPath
 }
 
 // путь до файла с логами

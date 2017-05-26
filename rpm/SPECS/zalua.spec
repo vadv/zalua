@@ -10,7 +10,7 @@ License:        BSD
 URL:            http://git.itv.restr.im/infra/%{bin_name}
 Source:         %{bin_name}-%{version}.tar.gz
 Source1:        zalua-logrotate.in
-BuildRequires:  make
+Requires:       zabbix-agent
 
 %define restream_dir /opt/restream/
 %define restream_zabbix_bin_dir %{restream_dir}/zabbix/bin
@@ -37,7 +37,10 @@ install -m 0755 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
 # plugins
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
 cp -rva config/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
-%{__install} -m 0644 config/config.lua %{buildroot}%{_sysconfdir}/%{bin_name}/config.lua
+%{__install} -m 0644 config/init.lua %{buildroot}%{_sysconfdir}/%{bin_name}/init.lua
+# zabbix
+%{__mkdir} -p %{buildroot}/%{_sysconfdir}/zabbix/zabbix.d
+%{__install} -m 0644 config/zabbix.conf %{buildroot}/%{_sysconfdir}/zabbix/zabbix.d/%{bin_name}_default.conf
 
 %clean
 rm -rf %{buildroot}
