@@ -104,23 +104,14 @@ while true do
     -- а вот с md пошло шульмование про utilization
     if dev:match("md") then
       local slaves_info = md_device_sizes(dev)
+      local total_slave_size = 0; for _, size in pairs(slaves_info) do total_slave_size = total_slave_size + size end
+      local raid_level = md_level(dev)
 
-      -- для raid0 просто суммируем все данные
-      if md_level(dev) == "raid0" then
-        local total_slaves = 0
-        for slave, _ in pairs(slaves_info) do
-          utilization = utilization + all_stats[slave]["utilization"]
-          total_slaves = total_slaves + 1
-        end
-        utilization = utilization / total_slaves
-      end
-
-      -- для raid1 просчитываем utilization с весом
+      -- для raid{0,1} просчитываем utilization с весом
       -- вес высчитывается = (размер slave) / (сумму размера slave-устройств)
-      if md_level(dev) == "raid1" then
-        local total_size = 0; for _, size in pairs(slaves_info) do total_size = total_size + size end
+      if (raid_level == "raid0") or (raid_level == "raid1") then
         for slave, size in pairs(slaves_info) do
-          local weight = size / total_size
+          local weight = size / total_slave_size
           utilization = utilization + (all_stats[slave]["utilization"] * weight)
         end
       end
@@ -129,10 +120,10 @@ while true do
     end
 
     -- остсылем все остальные метрики
-    metrics.set_speed("system.disk.read_bytes["..mountpoint.."]", all_stats[dev]["read_bytes"])
-    metrics.set_speed("system.disk.read_ops["..mountpoint.."]", all_stats[dev]["read_ops"])
-    metrics.set_speed("system.disk.write_bytes["..mountpoint.."]", all_stats[dev]["write_bytes"])
-    metrics.set_speed("system.disk.write_ops["..mountpoint.."]", all_stats[dev]["write_ops"])
+    metrics.set_speed("system.disk.read_bytes_in_sec["..mountpoint.."]", all_stats[dev]["read_bytes"])
+    metrics.set_speed("system.disk.read_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"])
+    metrics.set_speed("system.disk.write_bytes_in_sec["..mountpoint.."]", all_stats[dev]["write_bytes"])
+    metrics.set_speed("system.disk.write_ops_in_sec["..mountpoint.."]", all_stats[dev]["write_ops"])
   end
 
   metrics.set("system.disk.discovery", json.encode({data = discovery}))

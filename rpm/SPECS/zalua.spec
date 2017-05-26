@@ -36,8 +36,8 @@ install -m 0755 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
 %{__install} -m 0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{bin_name}
 # plugins
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
-cp -rva examples/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
-%{__install} -m 0644 examples/config.lua %{buildroot}%{_sysconfdir}/%{bin_name}/config.lua
+cp -rva config/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
+%{__install} -m 0644 config/config.lua %{buildroot}%{_sysconfdir}/%{bin_name}/config.lua
 
 %clean
 rm -rf %{buildroot}

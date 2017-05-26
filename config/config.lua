@@ -13,6 +13,7 @@ end
 while true do
   utils.sleep(5)
 
+  local error_count = 0
   for num, p in pairs(plugins) do
     if not p:is_running() then
       local err = p:error()
@@ -20,11 +21,14 @@ while true do
         -- плагин не запущен, и завершился с ошибкой
         log.error(err)
         p:run()
+        error_count = error_count + 1
+        metrics.set("zalua.error.last", err)
       else
         -- плагин остановлен и не завершился с ошибкой, удаляем его из списка
         table.remove(plugins, num)
       end
     end
   end
+  metrics.set("zalua.error.count", error_count)
 
 end

@@ -17,7 +17,9 @@ while true do
     end
   end
 
+  local discovery = {}
   for num, stats in pairs(numastats) do
+    local discovery_item = {}; discovery_item["{#NUMA_NODE}"] = num; table.insert(discovery, discovery_item)
     metrics.set_counter_speed('system.numa.numa_hit['..num..']', stats['numa_hit']) -- A process wanted to allocate memory from this node and succeeded.
     metrics.set_counter_speed('system.numa.numa_miss['..num..']', stats['numa_miss']) -- A process wanted to allocate memory from another node but ended up with memory from this node
     metrics.set_counter_speed('system.numa.numa_foreign['..num..']', stats['numa_foreign']) -- A process wanted to allocate memory from this node but ended up with memory from another node
@@ -25,6 +27,7 @@ while true do
     metrics.set_counter_speed('system.numa.local_node['..num..']', stats['local_node']) -- A process ran on this node and got memory from it
     metrics.set_counter_speed('system.numa.other_node['..num..']', stats['other_node']) -- A process ran on this node and got memory from another node
   end
+  metrics.set("system.numa.discovery", json.encode({data = discovery}))
 
-  utils.sleep(5)
+  utils.sleep(60)
 end
