@@ -83,7 +83,7 @@ func (c *dslConfig) dslStorageSet(L *lua.LState) int {
 		val = string(luaStr)
 	} else {
 		if luaFloat, ok := luaVal.(lua.LNumber); ok {
-			val = strconv.FormatFloat(float64(luaFloat), 'f', 6, 64)
+			val = strconv.FormatFloat(float64(luaFloat), 'f', 2, 64)
 		} else {
 			L.RaiseError("argument #2 must be string or number")
 		}

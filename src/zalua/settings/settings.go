@@ -11,6 +11,7 @@ var (
 	pluginConfigPath = "/etc/zalua/config.lua"
 
 	logPath                 = "/var/log/zabbix/zalua.log"
+	storagePath             = "/tmp/zalua-storage.json"
 	maxSizeRequest          = 64 * 1024
 	defaultReadTimeoutInMs  = 100
 	defaultWriteTimeoutInMs = 100
@@ -29,6 +30,11 @@ func PluginConfigPath() string {
 // путь до файла с логами
 func LogPath() string {
 	return logPath
+}
+
+// путь до файла с временным стораджем
+func StoragePath() string {
+	return storagePath
 }
 
 // чтение из сокета
