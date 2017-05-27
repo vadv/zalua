@@ -32,7 +32,7 @@ while true do
 
     -- вычисляем context switching
     local ctxt = line:match("^ctxt (%d+)")
-    if ctxt then metrics.set_counter_speed("system.cpu.ctxt", tonumber(ctxt)) end
+    if ctxt then metrics.set_counter_speed("system.stat.ctxt", tonumber(ctxt)) end
 
     -- вычисляем processes
     local processes = line:match("^processes (%d+)")
@@ -40,7 +40,7 @@ while true do
 
     -- вычисляем interupts
     local intr = line:match("^intr (%d+)")
-    if intr then metrics.set_counter_speed("system.cpu.intr", tonumber(intr)) end
+    if intr then metrics.set_counter_speed("system.stat.intr", tonumber(intr)) end
 
   end
   utils.sleep(60)
