@@ -16,10 +16,9 @@ while true do
   for line in io.lines("/proc/stat") do
 
     -- считаем cpu_count
-    local number = line:match("^cpu(%d)%s+.*")
-    if line:match("^cpu(%d)%s+.*") then
-      number = tonumber(number) + 1
-      if number > cpu_count then cpu_count = number end
+    local number = line:match("^cpu(%d+)%s+.*")
+    if number then
+      number = tonumber(number) + 1; if number > cpu_count then cpu_count = number end
     end
 
     -- разбираем строчку которая начинается с ^(cpu )
