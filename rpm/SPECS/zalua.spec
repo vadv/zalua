@@ -26,12 +26,6 @@ make
 
 %post
 rm -f /tmp/%{bin_name}-mon.sock
-%post
-if [ -x /usr/sbin/setcap ]; then
-    setcap cap_net_raw+ep %{restream_zabbix_bin_dir}/%{bin_name}
-else
-    chmod 1777 %{restream_zabbix_bin_dir}/%{bin_name}
-fi
 
 %install
 # bin
