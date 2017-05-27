@@ -12,7 +12,15 @@ end
 
 -- главный loop
 while true do
+  local cpu_count = 0
   for line in io.lines("/proc/stat") do
+
+    -- считаем cpu_count
+    local number = line:match("^cpu(%d)%s+.*")
+    if line:match("^cpu(%d)%s+.*") then
+      number = tonumber(number) + 1
+      if number > cpu_count then cpu_count = number end
+    end
 
     -- разбираем строчку которая начинается с ^(cpu )
     local cpu_all_line = line:match("^cpu%s+(.*)")
@@ -43,5 +51,6 @@ while true do
     if intr then metrics.set_counter_speed("system.stat.intr", tonumber(intr)) end
 
   end
+  metrics.set("system.cpu.count", cpu_count)
   utils.sleep(60)
 end
