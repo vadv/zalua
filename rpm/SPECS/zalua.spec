@@ -26,6 +26,12 @@ make
 
 %post
 rm -f /tmp/%{bin_name}-mon.sock
+%post
+if [ -x /usr/sbin/setcap ]; then
+    setcap cap_net_raw+ep %{restream_zabbix_bin_dir}/%{bin_name}
+else
+    chmod 1777 %{restream_zabbix_bin_dir}/%{bin_name}
+fi
 
 %install
 # bin
@@ -36,7 +42,7 @@ install -m 0755 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
 %{__install} -m 0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{bin_name}
 # plugins
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
-cp -rva config/plugins/* %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
+cp -v config/plugins/*.lua %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
 %{__install} -m 0644 config/init.lua %{buildroot}%{_sysconfdir}/%{bin_name}/init.lua
 # zabbix
 %{__mkdir} -p %{buildroot}/%{_sysconfdir}/zabbix/zabbix.d

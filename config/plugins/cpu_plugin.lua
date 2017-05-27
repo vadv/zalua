@@ -12,7 +12,6 @@ end
 
 -- главный loop
 while true do
-  local cpu_count = 0
   for line in io.lines("/proc/stat") do
 
     -- разбираем строчку которая начинается с ^(cpu )
@@ -20,25 +19,21 @@ while true do
     if cpu_all_line then
         local cpu_all_values = read_cpu_values(cpu_all_line)
         for key, value in pairs(cpu_all_values) do
-          metrics.set_speed("system.cpu.all."..key, value)
+          metrics.set_counter_speed("system.cpu.total."..key, value)
         end
     end
 
-    -- выясняем running, blocked `^procs_{running, blocked} \d+`
+    -- вычисляем running, blocked
     local processes = line:match("^procs_(.*)")
     if processes then
       local key, val = string.match(processes, "^(%S+)%s+(%d+)")
       metrics.set("system.processes."..key, tonumber(val))
     end
 
-    -- считаем cpu_count
-    local number = line:match("^cpu(%d)%s+.*")
-    if line:match("^cpu(%d)%s+.*") then
-        cpu_number = tonumber(number) + 1
-        if cpu_number > cpu_count then cpu_count = cpu_number end
-    end
+    -- вычисляем context switching
+    local ctxt = line:match("^ctxt (%d+)")
+    if ctxt then metrics.set_counter_speed("system.cpu.ctxt", tonumber(ctxt)) end
 
   end
-  metrics.set("system.cpu.count", cpu_count)
   utils.sleep(60)
 end
