@@ -34,6 +34,14 @@ while true do
     local ctxt = line:match("^ctxt (%d+)")
     if ctxt then metrics.set_counter_speed("system.cpu.ctxt", tonumber(ctxt)) end
 
+    -- вычисляем processes
+    local processes = line:match("^processes (%d+)")
+    if processes then metrics.set_counter_speed("system.processes.fork_rate", tonumber(processes)) end
+
+    -- вычисляем interupts
+    local intr = line:match("^intr (%d+)")
+    if intr then metrics.set_counter_speed("system.cpu.intr", tonumber(intr)) end
+
   end
   utils.sleep(60)
 end
