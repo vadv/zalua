@@ -147,14 +147,14 @@ while true do
       end
     end
 
-    metrics.set_speed("system.disk.utilization["..mountpoint.."]", utilization)
+    metrics.set_counter_speed("system.disk.utilization["..mountpoint.."]", utilization)
     if await then metrics.set("system.disk.await["..mountpoint.."]", await) end
 
     -- остсылем все остальные метрики
-    metrics.set_speed("system.disk.read_bytes_in_sec["..mountpoint.."]", all_stats[dev]["read_bytes"])
-    metrics.set_speed("system.disk.read_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"])
-    metrics.set_speed("system.disk.write_bytes_in_sec["..mountpoint.."]", all_stats[dev]["write_bytes"])
-    metrics.set_speed("system.disk.write_ops_in_sec["..mountpoint.."]", all_stats[dev]["write_ops"])
+    metrics.set_counter_speed("system.disk.read_bytes_in_sec["..mountpoint.."]", all_stats[dev]["read_bytes"])
+    metrics.set_counter_speed("system.disk.read_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"])
+    metrics.set_counter_speed("system.disk.write_bytes_in_sec["..mountpoint.."]", all_stats[dev]["write_bytes"])
+    metrics.set_counter_speed("system.disk.write_ops_in_sec["..mountpoint.."]", all_stats[dev]["write_ops"])
   end
 
   metrics.set("system.disk.discovery", json.encode({data = discovery}))
