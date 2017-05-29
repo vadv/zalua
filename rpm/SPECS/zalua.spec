@@ -26,12 +26,11 @@ make
 
 %post
 rm -f /tmp/%{bin_name}-mon.sock
-chmod 4777 %{restream_zabbix_bin_dir}/%{bin_name}
 
 %install
 # bin
 %{__mkdir} -p %{buildroot}%{restream_zabbix_bin_dir}
-install -m 0755 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
+install -m 4777 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
 # logrotate
 %{__mkdir} -p %{buildroot}/%{_sysconfdir}/logrotate.d
 %{__install} -m 0644 %{SOURCE1} %{buildroot}/%{_sysconfdir}/logrotate.d/%{bin_name}
