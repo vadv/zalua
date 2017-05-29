@@ -115,3 +115,18 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 * пытается сопоставить блочному девайсу /mount/pount
 * расчитывает await и utilization по тем блочным девайсам, по которым ядро не ведет статистику (mdraid)
+
+### SNMP
+
+данные из /proc/net/snmp
+
+![tcp connections](/img/tcp-speed.png)
+![tcp error](/img/tcp-errors.png)
+
+
+### NUMA
+
+статистика выделения памяти и доступа к ней
+
+![numa access](/img/numa-access.png)
+![numa allocate](/img/numa-alloc.png)
