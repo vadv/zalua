@@ -106,3 +106,12 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error
     * `log.info(msg)` с уровнем info
+
+## Примеры плагинов
+
+### Diskstat
+
+![await](/img/await.JPG)
+
+* пытается сопоставить блочному девайсу /mount/pount
+* расчитывает await и utilization по тем блочным девайсам, по которым ядро не ведет статистику (mdraid)
