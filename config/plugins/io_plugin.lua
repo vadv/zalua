@@ -6,9 +6,11 @@ function read_proc_io()
     local data = ioutil.readfile(file)
     if data then
       for _, line in pairs(strings.split(data, "\n")) do
-        local key, val = line:gmatch("^(%s)+:%S+(%d+)$")
-        if not row[key] then row[key] = 0 end
-        row[key] = row[key] + tonumber(val)
+        local key, val = line:gmatch("^(%S+):%s+(%d+)$")
+        if key then
+          if not row[key] then row[key] = 0 end
+          row[key] = row[key] + tonumber(val)
+        end
       end
     end
   end
