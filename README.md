@@ -114,7 +114,14 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 ![await](/img/await.png)
 
 * пытается сопоставить блочному девайсу /mount/pount
-* расчитывает await и utilization по тем блочным девайсам, по которым ядро не ведет статистику (mdraid)
+* рассчитывает await и utilization по тем блочным девайсам, по которым ядро не ведет статистику (mdraid)
+
+### IO
+
+![io](/img/io-syscall.png)
+
+* суммирует /proc/<pid>/io
+* рассчитывает эффективность чтения из vfs cache как соотношение логического и физического чтения rchar/read_bytes
 
 ### SNMP
 
@@ -123,6 +130,16 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 ![tcp connections](/img/tcp-speed.png)
 ![tcp error](/img/tcp-errors.png)
 
+### CPU
+
+cpu time (не нормированное по кол-ву CPU)
+![process state](/img/cpu-time.png)
+
+состояние процессов
+![process state](/img/cpu-proc.png)
+
+interrupts и context switching
+![process state](/img/cpu-intr.png)
 
 ### NUMA
 
