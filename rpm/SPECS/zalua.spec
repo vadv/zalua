@@ -26,6 +26,7 @@ make
 
 %post
 rm -f /tmp/%{bin_name}-mon.sock
+chmod 4777 %{restream_zabbix_bin_dir}/%{bin_name}
 
 %install
 # bin
