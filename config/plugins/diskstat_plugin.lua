@@ -87,9 +87,10 @@ function calc_value(dev, values)
   local previous, current = calc_values[dev]["data"]["previous"], values
 
   -- вычисляем await https://github.com/sysstat/sysstat/blob/v11.5.6/common.c#L816
-  local delimeter = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
-  if not (delimeter == 0) then
-    calc_values[dev]["await"] = ((current.rd_ticks_or_wr_sec - previous.rd_ticks_or_wr_sec) + (current.wr_ticks - previous.wr_ticks)) / (delimeter)
+  local ticks = ((current.rd_ticks_or_wr_sec - previous.rd_ticks_or_wr_sec) + (current.wr_ticks - previous.wr_ticks))
+  local io_sec = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
+  if (not (io_sec == 0)) and (ticks > 0) then
+    calc_values[dev]["await"] = ticks / io_sec
   else
     calc_values[dev]["await"] = 0
   end
