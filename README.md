@@ -86,6 +86,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 
+* *strings*:
+    * `strings.split(str, delim)` порт golang strings.split()
+
 * *json*:
     * `json.encode(N)` lua-table в string
     * `json.decode(N)` string в lua-table

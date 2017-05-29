@@ -58,7 +58,12 @@ end
 
 -- mdX => raid0, raid1, ...
 function md_level(mdX)
-  return ioutil.readfile("/sys/block/"..mdX.."/md/level"):gsub("^%s+", ""):gsub("%s+$", "")
+  local data = ioutil.readfile("/sys/block/"..mdX.."/md/level")
+  if data then
+    return data:gsub("%s+$", "")
+  else
+    return nil
+  end
 end
 
 -- mdX => {sda = X, dm-0 = Y}
@@ -130,18 +135,18 @@ while true do
       local slaves_info = md_device_sizes(dev)
       local total_slave_size = 0; for _, size in pairs(slaves_info) do total_slave_size = total_slave_size + size end
       local raid_level = md_level(dev)
-
-      -- для raid{0,1} просчитываем utilization с весом
-      -- вес высчитывается = (размер slave) / (сумму размера slave-устройств)
-      if (raid_level == "raid0") or (raid_level == "raid1") then
-        for slave, size in pairs(slaves_info) do
-          local weight = size / total_slave_size
-          utilization = utilization + (all_stats[slave]["utilization"] * weight)
-
-          local slave_await = calc_values[slave]["await"]
-          if slave_await then
-            if await == nil then await = 0 end
-            await = await + (slave_await * weight)
+      if raid_level then -- пропускаем непонятный raid
+        -- для raid{0,1} просчитываем utilization с весом
+        -- вес высчитывается = (размер slave) / (сумму размера slave-устройств)
+        if (raid_level == "raid0") or (raid_level == "raid1") then
+          for slave, size in pairs(slaves_info) do
+            local weight = size / total_slave_size
+            utilization = utilization + (all_stats[slave]["utilization"] * weight)
+            local slave_await = calc_values[slave]["await"]
+            if slave_await then
+              if await == nil then await = 0 end
+              await = await + (slave_await * weight)
+            end
           end
         end
       end
