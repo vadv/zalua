@@ -111,7 +111,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 ### Diskstat
 
-![await](/img/await.JPG)
+![await](/img/await.png)
 
 * пытается сопоставить блочному девайсу /mount/pount
 * расчитывает await и utilization по тем блочным девайсам, по которым ядро не ведет статистику (mdraid)
