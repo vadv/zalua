@@ -120,7 +120,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 ![io](/img/io-syscall.png)
 
-* суммирует /proc/<pid>/io
+* суммирует /proc/*pid*/io
 * рассчитывает эффективность чтения из vfs cache как соотношение логического и физического чтения rchar/read_bytes
 
 ### SNMP
