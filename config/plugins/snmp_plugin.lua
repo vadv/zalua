@@ -5,7 +5,8 @@ function parse_tcp(str)
     'RtoAlgorithm', 'RtoMin', 'RtoMax',
     'MaxConn', 'ActiveOpens', 'PassiveOpens',
     'AttemptFails', 'EstabResets', 'CurrEstab',
-    'InSegs', 'OutSegs', 'RetransSegs', 'InErrs', 'OutRsts'}
+    'InSegs', 'OutSegs', 'RetransSegs', 'InErrs',
+    'OutRsts', 'InCsumErrors'}
 
   local row, offset = {}, 1
   for value in str:gmatch("(%d+)") do
