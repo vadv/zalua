@@ -89,10 +89,11 @@ function calc_value(dev, values)
   -- вычисляем await https://github.com/sysstat/sysstat/blob/v11.5.6/common.c#L816
   local ticks = ((current.rd_ticks_or_wr_sec - previous.rd_ticks_or_wr_sec) + (current.wr_ticks - previous.wr_ticks))
   local io_sec = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
-  if (not (io_sec == 0)) and (ticks > 0) then
+  if (io_sec > 0) and (ticks > 0) then
     calc_values[dev]["await"] = ticks / io_sec
   else
-    calc_values[dev]["await"] = 0
+    -- игнорируем проворот счетчика
+    if (io_sec == 0) then calc_values[dev]["await"] = 0 end
   end
 
   -- перетираем предыдущее значение
