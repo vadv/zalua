@@ -103,6 +103,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `os.stat(filename)` os.stat возвращает таблицу с полями `{size, is_dir, mod_time}`, в случае ошибки возращает nil.
     * `os.pagesize()` возвращет pagesize
 
+* *time*:
+    * `time.unix()` время в секундах
+    * `time.unix_nano()` время в наносекундах
+
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error
     * `log.info(msg)` с уровнем info

@@ -50,6 +50,11 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(os, "stat", L.NewFunction(config.dslOsStat))
 	L.SetField(os, "pagesize", L.NewFunction(config.dslOsPagesize))
 
+	time := L.NewTypeMetatable("time")
+	L.SetGlobal("time", time)
+	L.SetField(time, "unix", L.NewFunction(config.dslTimeUnix))
+	L.SetField(time, "unix_nano", L.NewFunction(config.dslTimeUnixNano))
+
 	strings := L.NewTypeMetatable("strings")
 	L.SetGlobal("strings", strings)
 	L.SetField(strings, "split", L.NewFunction(config.dslStringsSplit))
