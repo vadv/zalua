@@ -5,7 +5,7 @@ local services = {}
 -- главный loop
 while true do
 
-  local bad_services = "" -- пытаемся сократить кол-во сообщений в zabbix
+  local bad_services = '' -- пытаемся сократить кол-во сообщений в zabbix
 
   -- если есть директория
   if os.stat('/etc/service') then
@@ -21,21 +21,21 @@ while true do
           -- подозрительный сервис
           if services[name] and (services[name] < 60) then
             -- был до этого уже замечен, отмечаем как флапающий
-            local desc = name.." is flapping"
-            if bad_services == "" then bad_services = desc else bad_services = bad_services..", "..desc end
+            local desc = name..' has flapping uptime'
+            if bad_services == '' then bad_services = desc else bad_services = bad_services..', '..desc end
           end
         end
       else
         -- процесс слинкован, но не запущен и это уже плохо
-        local desc = name.." is not running"
-        if bad_services == "" then bad_services = desc else bad_services = bad_services..", "..desc end
+        local desc = name.." has linked, but isn't running"
+        if bad_services == '' then bad_services = desc else bad_services = bad_services..', '..desc end
       end
       services[name] = uptime
 
     end
   end
 
-  if not (bad_services == "") then bad_services = "Found problem runit service(s): "..bad_services end
-  metrics.set("runit.problem", bad_services)
+  if not (bad_services == '') then bad_services = 'Found problem with runit services: '..bad_services end
+  metrics.set('runit.problem', bad_services)
   utils.sleep(60)
 end
