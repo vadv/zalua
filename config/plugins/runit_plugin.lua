@@ -7,7 +7,7 @@ while true do
 
   local problem = '' -- пытаемся сократить кол-во сообщений в zabbix
 
-  -- если есть директория
+  -- если есть /etc/service
   if os.stat('/etc/service') then
     for _, file in pairs(filepath.glob('/etc/service/*')) do
 
@@ -33,9 +33,12 @@ while true do
       services[name] = uptime
 
     end
-  end
 
-  if not (problem == '') then problem = 'Found problem with runit services: '..problem end
-  metrics.set('runit.problem', problem)
+    if not (problem == '') then problem = 'Found problem with runit services: '..problem end
+    metrics.set('runit.problem', problem)
+  else
+    -- метрика будет unsupported, что снизит нагрузку на zabbix-сервер
+    metrics.delete('runit.problem')
+  end
   utils.sleep(60)
 end
