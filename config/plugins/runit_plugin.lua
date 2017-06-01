@@ -1,5 +1,5 @@
 -- плагин который сообщает только одну метрику в zabbix
--- все процессы запущены и работают или какие-то не запущены
+-- все процессы запущены и работают или какие-то не запущены или "флапают"
 local services = {}
 
 -- главный loop
@@ -21,13 +21,13 @@ while true do
           -- подозрительный сервис
           if services[name] and (services[name] < 60) then
             -- был до этого уже замечен, отмечаем как флапающий
-            local desc = name..' has flapping uptime'
+            local desc = "'"..name.."' has flapping uptime"
             if bad_services == '' then bad_services = desc else bad_services = bad_services..', '..desc end
           end
         end
       else
         -- процесс слинкован, но не запущен и это уже плохо
-        local desc = name.." has linked, but isn't running"
+        local desc = "'"..name.."' has linked, but isn't running"
         if bad_services == '' then bad_services = desc else bad_services = bad_services..', '..desc end
       end
       services[name] = uptime

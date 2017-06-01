@@ -36,22 +36,18 @@
 
 ```
 $ zalua -p
-/etc/zalua/plugins/buddyinfo_plugin.lua         false           /etc/zalua/plugins/buddyinfo_plugin.lua at 1: parse error
+/etc/zalua/plugins/bad_plugin.lua         false           /etc/zalua/plugins/buddyinfo_plugin.lua at 1: parse error
 /etc/zalua/plugins/numa_plugin.lua              false           <no error>
 /etc/zalua/plugins/snmp_plugin.lua              true            <no error>
 
 
 $ zalua -m
-system.tcp.active               0.000000                1495702422
-system.tcp.established          1.000000                1495702422
-system.tcp.failed               0.000000                1495702422
-system.tcp.passive              0.000000                1495702422
-system.tcp.resets               0.000000                1495702422
 system.disk.read_bytes[/video]          23454385.653432         1495748781
 system.disk.read_ops[/video]            46.463452               1495748781
 system.disk.utilization[/video]         51.029993               1495748781
 system.disk.write_bytes[/video]         6872556.411429          1495748781
 system.disk.write_ops[/video]           25.724433               1495748781
+runit.problem           Found problem with runit services: 'nginx' has linked, but isn't running   1495748781
 
 $ zalua -g system.tcp.active
 0.000000
