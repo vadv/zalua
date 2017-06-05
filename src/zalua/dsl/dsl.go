@@ -21,6 +21,13 @@ func Register(config *dslConfig, L *lua.LState) {
 		"is_running": config.dslPluginIsRunning,
 	}))
 
+	postgres := L.NewTypeMetatable("postgres")
+	L.SetGlobal("postgres", postgres)
+	L.SetField(postgres, "open", L.NewFunction(config.dslNewPgsqlConn))
+	L.SetField(postgres, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"query": config.dslPgsqlQuery,
+	}))
+
 	storage := L.NewTypeMetatable("metrics")
 	L.SetGlobal("metrics", storage)
 	L.SetField(storage, "get", L.NewFunction(config.dslStorageGet))
@@ -29,10 +36,6 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(storage, "set_counter_speed", L.NewFunction(config.dslStorageSetCounterSpeed))
 	L.SetField(storage, "list", L.NewFunction(config.dslStorageList))
 	L.SetField(storage, "delete", L.NewFunction(config.dslStorageDelete))
-
-	utils := L.NewTypeMetatable("utils")
-	L.SetGlobal("utils", utils)
-	L.SetField(utils, "sleep", L.NewFunction(config.dslSleep))
 
 	ioutil := L.NewTypeMetatable("ioutil")
 	L.SetGlobal("ioutil", ioutil)
@@ -54,6 +57,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("time", time)
 	L.SetField(time, "unix", L.NewFunction(config.dslTimeUnix))
 	L.SetField(time, "unix_nano", L.NewFunction(config.dslTimeUnixNano))
+	L.SetField(time, "sleep", L.NewFunction(config.dslTimeSleep))
 
 	strings := L.NewTypeMetatable("strings")
 	L.SetGlobal("strings", strings)

@@ -11,7 +11,7 @@ end
 
 -- супервизор для плагинов
 while true do
-  utils.sleep(5)
+  time.sleep(5)
 
   local error_count = 0
   for num, p in pairs(plugins) do

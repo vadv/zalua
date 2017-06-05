@@ -18,5 +18,5 @@ while true do
 --  metrics.set("system.la.5", avg.minute5avg)
 --  metrics.set("system.la.15", avg.minute15avg)
   metrics.set_counter_speed("system.fork_rate", avg.lastpid)
-  utils.sleep(60)
+  time.sleep(60)
 end

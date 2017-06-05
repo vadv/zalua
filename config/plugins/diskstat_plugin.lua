@@ -165,5 +165,5 @@ while true do
   end
 
   metrics.set("system.disk.discovery", json.encode({data = discovery}))
-  utils.sleep(60)
+  time.sleep(60)
 end

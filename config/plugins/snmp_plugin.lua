@@ -35,5 +35,5 @@ while true do
     end
   end
 
-  utils.sleep(60)
+  time.sleep(60)
 end

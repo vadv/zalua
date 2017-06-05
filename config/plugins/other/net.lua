@@ -27,5 +27,5 @@ while true do
     end
   end
   metrics.set("system.net.discovery", json.encode({data = discovery}))
-  utils.sleep(60)
+  time.sleep(60)
 end

@@ -62,7 +62,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 ## lua-DSL
 
 * *plugin*:
-    * `p = plugin.new(filename)` создать плагин
+    * `p = plugin.new(filename)` загрузить плагин
     * `p:run()` запустить плагин
     * `p:stop()` остановить вызвав ошибку stop в плагине
     * `p:is_running()` запущен или нет плагин
@@ -76,8 +76,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `metric.list()` список метрик
     * `metric.delete(key)` удалить значение метрики key
 
-* *utils*:
-    * `utils.sleep(N)` проспать N секунд
+* *postgres*:
+    * `db, err = postgres.open({"database"="xxx", "host"="127.0.0.1", "user"="xxx", "password"="xxx"})` открыть коннект
+    * `rows, err, column_count, row_count = db:query()` выполнить запрос
 
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
@@ -100,6 +101,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `os.pagesize()` возвращет pagesize
 
 * *time*:
+    * `time.sleep(N)` проспать N секунд
     * `time.unix()` время в секундах
     * `time.unix_nano()` время в наносекундах
 

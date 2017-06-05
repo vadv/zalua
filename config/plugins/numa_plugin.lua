@@ -29,5 +29,5 @@ while true do
   end
   metrics.set("system.numa.discovery", json.encode({data = discovery}))
 
-  utils.sleep(60)
+  time.sleep(60)
 end

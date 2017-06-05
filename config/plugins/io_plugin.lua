@@ -23,7 +23,7 @@ while true do
   -- сбираем статистику за snapshot_timeout
   local snapshot_timeout = 10
   local row1 = read_proc_io()
-  utils.sleep(snapshot_timeout)
+  time.sleep(snapshot_timeout)
   local row2 = read_proc_io()
 
   local logical_read = row2["rchar"] - row1["rchar"]
@@ -37,5 +37,5 @@ while true do
   metrics.set_counter_speed("system.io.syscr", row1["syscr"])
   metrics.set_counter_speed("system.io.syscw", row1["syscw"])
 
-  utils.sleep(60-snapshot_timeout)
+  time.sleep(60-snapshot_timeout)
 end

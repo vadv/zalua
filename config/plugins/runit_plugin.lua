@@ -40,5 +40,5 @@ while true do
     -- метрика будет unsupported, что снизит нагрузку на zabbix-сервер
     metrics.delete('runit.problem')
   end
-  utils.sleep(60)
+  time.sleep(60)
 end

@@ -51,5 +51,5 @@ while true do
 
   end
   metrics.set("system.cpu.count", cpu_count)
-  utils.sleep(60)
+  time.sleep(60)
 end
