@@ -77,7 +77,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `metric.delete(key)` удалить значение метрики key
 
 * *postgres*:
-    * `db, err = postgres.open({"database"="xxx", "host"="127.0.0.1", "user"="xxx", "password"="xxx"})` открыть коннект
+    * `db, err = postgres.open({database="xxx", host="127.0.0.1", user="xxx", password="xxx"})` открыть коннект
     * `rows, err, column_count, row_count = db:query()` выполнить запрос
 
 * *ioutil*:

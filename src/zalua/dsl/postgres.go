@@ -19,7 +19,8 @@ type pgsqlConn struct {
 }
 
 func (p *pgsqlConn) connectionString() string {
-	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable&fallback_application_name=zalua&connect_timeout=5", p.user, p.passwd, p.host, p.port, p.database)
+	return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable fallback_application_name=zalua connect_timeout=5",
+		p.user, p.passwd, p.host, p.port, p.database)
 }
 
 func (p *pgsqlConn) connect() error {
@@ -72,18 +73,19 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (luaRows *lua.LTable, resultErr
 		for i, _ := range cols {
 			valueP := pointers[i].(*interface{})
 			value := *valueP
-			key := lua.LNumber(i + 1) // в lua начинается с 1
 			switch converted := value.(type) {
 			case bool:
-				luaRow.RawSet(key, lua.LBool(converted))
+				luaRow.RawSetInt(i+1, lua.LBool(converted))
 			case float64:
-				luaRow.RawSet(key, lua.LNumber(converted))
+				luaRow.RawSetInt(i+1, lua.LNumber(converted))
 			case int64:
-				luaRow.RawSet(key, lua.LNumber(converted))
+				luaRow.RawSetInt(i+1, lua.LNumber(converted))
 			case string:
-				luaRow.RawSet(key, lua.LString(converted))
+				luaRow.RawSetInt(i+1, lua.LString(converted))
+			case []byte:
+				luaRow.RawSetInt(i+1, lua.LString(string(converted)))
 			default:
-				luaRow.RawSet(key, lua.LNil) // на самом деле ничего не значит
+				luaRow.RawSetInt(i+1, lua.LNil) // на самом деле ничего не значит
 			}
 		}
 		luaRows.RawSet(lua.LNumber(rowCount), luaRow)
