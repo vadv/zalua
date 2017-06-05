@@ -8,35 +8,26 @@ local connection = {
 }
 if os.stat('/tmp/.s.PGSQL.5432') then connection.host = '/tmp/.s.PGSQL.5432' end
 
-local pool = {}
-local init_connect, err = postgres.open(connection)
+local main_db, err = postgres.open(connection)
 if err then error(err) end
 
 -- устанавливаем лимит на выполнение любого запроса 10s
-local _, err = init_connect:query("set statement_timeout to '10s'")
+local _, err = main_db:query("set statement_timeout to '10s'")
 if err then error(err) end
 
 while true do
-
   local discovery = {}
   -- выполняем запрос из главной базы
-  local rows, err = init_connect:query("select \
+  local rows, err = main_db:query("select \
       datname, pg_catalog.pg_database_size(datname::text), pg_catalog.age(datfrozenxid) \
       from pg_catalog.pg_database where datistemplate = false")
   if err then error(err) end
   for _, row in pairs(rows) do
     local dbname, size, age = row[1], row[2], row[3]
-    -- пробуем открыть коннект, и если подконнектились, то добавляем в pool
-    if pool[dbname] == nil then
-      connection.database = dbname
-      local conn, err = postgres.open(connection)
-      if err then log.info("can't connect to database "..dbname..": "..err) else pool[dbname] = conn end
-    end
     metrics.set('postgres.database.size['..dbname..']', size)
     metrics.set('postgres.database.age['..dbname..']', age)
     local discovery_item = {}; discovery_item["{#DATABASE}"] = dbname; table.insert(discovery, discovery_item)
   end
-
   metrics.set("postgres.database.discovery", json.encode({data = discovery}))
   time.sleep(60)
 end
