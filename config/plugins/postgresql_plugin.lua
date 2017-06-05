@@ -1,5 +1,11 @@
+-- немного тупого "auto-discovery" для включения плагина
+local enabled = false
+if os.stat('/var/lib/postgresql') then enabled = true end
+if os.stat('/var/lib/pgsql') then enabled = true end
+if not enabled then return end
+
 -- для работы данного плагина необходимо
--- 1. создать пользователя zabbix `create user zabbix with superuser;`
+-- 1. создать пользователя zabbix `create user zabbix;`
 -- 2. дать разрешение на подключение под unix-пользователем zabbix в pg_hba: `local all zabbix peer`
 local connection = {
   host     = '/var/run/postgresql/.s.PGSQL.5432',
@@ -8,6 +14,7 @@ local connection = {
 }
 if os.stat('/tmp/.s.PGSQL.5432') then connection.host = '/tmp/.s.PGSQL.5432' end
 
+-- открываем "главный" коннект
 local main_db, err = postgres.open(connection)
 if err then error(err) end
 
@@ -17,7 +24,7 @@ if err then error(err) end
 
 while true do
   local discovery = {}
-  -- выполняем запрос из главной базы
+  -- выполняем из главной базы общий запрос на размеры и статусы
   local rows, err = main_db:query("select \
       datname, pg_catalog.pg_database_size(datname::text), pg_catalog.age(datfrozenxid) \
       from pg_catalog.pg_database where datistemplate = false")
