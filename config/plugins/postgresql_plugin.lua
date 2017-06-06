@@ -74,7 +74,7 @@ while true do
         local diff_times, diff_calls, diff_time = (current_times - prev_times), (current_calls - prev_calls), (current_time - prev_time)
         if (diff_times > 0) and (diff_calls > 0) and (diff_time > 0) then
           metrics.set('postgres.queries.count', diff_calls/diff_time)
-          metrics.set('postgres.queries.avg_time_ms', 1000*diff_times/diff_calls)
+          metrics.set('postgres.queries.avg_time_ms', diff_times/diff_calls)
         end
       end
       pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time'] = current_times, current_calls, current_time
