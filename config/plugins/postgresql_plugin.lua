@@ -30,7 +30,12 @@ while true do
   if err then error(err) end
   local pg_is_in_recovery = rows[1][1]
 
-  if not pg_is_in_recovery then
+  if pg_is_in_recovery then
+    -- is slave
+    local rows, err = main_db:query("select extract(epoch from now()-pg_last_xact_replay_timestamp())")
+    if err then error(err) end
+    metrics.set('postgres.wal.last_apply', rows[1][1])
+  else
     -- is master
     local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff \
       (pg_catalog.pg_current_xlog_location(),'0/00000000')")
@@ -38,9 +43,29 @@ while true do
     metrics.set_counter_speed('postgres.wal.write', rows[1][1])
   end
 
-  -- < 9.6 only!
+  -- < 9.6 только! (количество файлов pg_xlog)
   local rows, err = main_db:query("select count(*) from pg_catalog.pg_ls_dir('pg_xlog')")
   if not err then metrics.set('postgres.wal.count', rows[1][1]) end
+
+  -- кол-во autovacuum воркеров
+  local rows, err = main_db:query("select count(*) from pg_catalog.pg_stat_activity where \
+    query like '%autovacuum%' and state <> 'idle'")
+  if not err then metrics.set('postgres.connections.autovacuum', rows[1][1]) end
+
+  -- кол-во коннектов
+  local rows, err = main_db:query("select state, count(*) from pg_catalog.pg_stat_activity group by state")
+  if not err then
+    for _, state in pairs({'active', 'idle', 'idle in transaction'}) do
+      local state_value = 0
+      -- если находим такой state в результатах, то присваеваем его
+      for _, row in pairs(rows) do
+        if (row[1] == state) then
+          state_value = row[2]
+        end
+      end
+      metrics.set('postgres.connections.'..state, state_value)
+    end
+  end
 
   -- выполняем из главной базы общий запрос на размеры и статусы
   local rows, err = main_db:query("select \
