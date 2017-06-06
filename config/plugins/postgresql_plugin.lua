@@ -22,6 +22,22 @@ if err then error(err) end
 local _, err = main_db:query("set statement_timeout to '10s'")
 if err then error(err) end
 
+-- пробуем активировать расширение pg_stat_statements
+local use_pg_stat_statements, pg_stat_statment_values = false, {}
+local rows, err = main_db:query("select count(*) from pg_catalog.pg_extension where extname = 'pg_stat_statements'")
+if not err then
+  if rows[1][1] == 1 then
+    use_pg_stat_statements = true
+  else
+    _, err = main_db:query("create extension pg_stat_statements;")
+    if err then
+      log.error("enable `pg_stat_statements`: "..tostring(err))
+    else
+      use_pg_stat_statements = true
+    end
+  end
+end
+
 while true do
   local discovery = {}
 
@@ -43,6 +59,29 @@ while true do
     metrics.set_counter_speed('postgres.wal.write_bytes_in_sec', rows[1][1])
   end
 
+  -- если активно pg_stat_statements
+  if use_pg_stat_statements then
+    local rows, err = main_db:query("select sum(total_time)*1000 as times, sum(calls) as calls, \
+      sum(blk_read_time)*1000 as disk_read_time, sum(blk_write_time)*1000 as disk_write_time, sum(total_time - blk_read_time - blk_write_time)*1000 as other_time \
+      from public.pg_stat_statements;")
+    if not err then
+      local current_times, current_calls, current_time = rows[1][1], rows[1][2], time.unix()
+      metrics.set_counter_speed('postgres.queries.disk_read_time', rows[1][3])
+      metrics.set_counter_speed('postgres.queries.disk_write_time', rows[1][4])
+      metrics.set_counter_speed('postgres.queries.other_time', rows[1][5])
+      local prev_times, prev_calls, prev_time = pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time']
+      if prev_times then
+        local diff_times, diff_calls, diff_time = (current_times - prev_times), (current_calls - prev_calls), (current_time - prev_time)
+        if (diff_times > 0) and (diff_calls > 0) and (diff_time > 0) then
+          metrics.set('postgres.queries.time', diff_times/diff_time)
+          metrics.set('postgres.queries.count', diff_calls/diff_time)
+          metrics.set('postgres.queries.avg_time', diff_times/diff_calls)
+        end
+      end
+      pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time'] = current_times, current_calls, current_time
+    end
+  end
+
   -- < 9.6 только! (количество файлов pg_xlog)
   local rows, err = main_db:query("select count(*) from pg_catalog.pg_ls_dir('pg_xlog')")
   if not err then metrics.set('postgres.wal.count', rows[1][1]) end
@@ -55,7 +94,7 @@ while true do
   -- кол-во коннектов
   local rows, err = main_db:query("select state, count(*) from pg_catalog.pg_stat_activity group by state")
   if not err then
-    for _, state in pairs({'active', 'idle', 'idle in transaction'}) do
+    for _, state in pairs({'active', 'idle', 'waiting', 'idle in transaction'}) do
       local state_value = 0
       -- если находим такой state в результатах, то присваеваем его
       for _, row in pairs(rows) do
