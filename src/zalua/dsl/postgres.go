@@ -25,6 +25,7 @@ func (p *pgsqlConn) connectionString() string {
 
 func (p *pgsqlConn) connect() error {
 	if p.db == nil {
+		log.Printf("[INFO] open postgres connection: `%s`\n", p.connectionString())
 		db, err := sql.Open("postgres", p.connectionString())
 		if err != nil {
 			return err
