@@ -66,16 +66,16 @@ while true do
       from public.pg_stat_statements;")
     if not err then
       local current_times, current_calls, current_time = rows[1][1], rows[1][2], time.unix()
-      metrics.set_counter_speed('postgres.queries.disk_read_time', rows[1][3])
-      metrics.set_counter_speed('postgres.queries.disk_write_time', rows[1][4])
-      metrics.set_counter_speed('postgres.queries.other_time', rows[1][5])
+      metrics.set_counter_speed('postgres.time.disk_read_time', rows[1][3])
+      metrics.set_counter_speed('postgres.time.disk_write_time', rows[1][4])
+      metrics.set_counter_speed('postgres.time.other_time', rows[1][5])
       local prev_times, prev_calls, prev_time = pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time']
       if prev_times then
         local diff_times, diff_calls, diff_time = (current_times - prev_times), (current_calls - prev_calls), (current_time - prev_time)
         if (diff_times > 0) and (diff_calls > 0) and (diff_time > 0) then
-          metrics.set('postgres.queries.time', diff_times/diff_time)
+          metrics.set('postgres.queries.spend_time', diff_times/diff_time)
           metrics.set('postgres.queries.count', diff_calls/diff_time)
-          metrics.set('postgres.queries.avg_time', diff_times/diff_calls)
+          metrics.set('postgres.queries.avg_time_ms', 1000*diff_times/diff_calls)
         end
       end
       pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time'] = current_times, current_calls, current_time
