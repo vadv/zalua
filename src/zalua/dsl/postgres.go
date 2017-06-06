@@ -19,14 +19,15 @@ type pgsqlConn struct {
 }
 
 func (p *pgsqlConn) connectionString() string {
-	return fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable fallback_application_name=zalua connect_timeout=5",
-		p.user, p.passwd, p.host, p.port, p.database)
+	return fmt.Sprintf("host='%s' port='%d' user='%s' dbname='%s' password='%s' sslmode='disable' fallback_application_name='zalua' connect_timeout='5'",
+		p.host, p.port, p.user, p.database, p.passwd)
 }
 
 func (p *pgsqlConn) connect() error {
 	if p.db == nil {
-		log.Printf("[INFO] open postgres connection: `%s`\n", p.connectionString())
-		db, err := sql.Open("postgres", p.connectionString())
+		connStr := p.connectionString()
+		log.Printf("[INFO] open postgres connection: `%s`\n", connStr)
+		db, err := sql.Open("postgres", connStr)
 		if err != nil {
 			return err
 		}

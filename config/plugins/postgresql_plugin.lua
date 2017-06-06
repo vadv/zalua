@@ -5,14 +5,14 @@ if os.stat('/var/lib/pgsql') then enabled = true end
 if not enabled then return end
 
 -- для работы данного плагина необходимо
--- 1. создать пользователя zabbix `create user zabbix;`
--- 2. дать разрешение на подключение под unix-пользователем zabbix в pg_hba: `local all zabbix peer`
+-- 1. создать пользователя root `create user root;`
+-- 2. дать разрешение в pg_hba: `local all root peer`
 local connection = {
-  host     = '/var/run/postgresql/.s.PGSQL.5432',
-  user     = 'zabbix',
+  host     = '/tmp',
+  user     = 'root',
   database = 'postgres'
 }
-if os.stat('/tmp/.s.PGSQL.5432') then connection.host = '/tmp/.s.PGSQL.5432' end
+if os.stat('/var/run/postgresql/.s.PGSQL.5432') then connection.host = '/var/run/postgresql' end
 
 -- открываем "главный" коннект
 local main_db, err = postgres.open(connection)
