@@ -25,9 +25,7 @@ func (p *pgsqlConn) connectionString() string {
 
 func (p *pgsqlConn) connect() error {
 	if p.db == nil {
-		connStr := p.connectionString()
-		log.Printf("[INFO] open postgres connection: `%s`\n", connStr)
-		db, err := sql.Open("postgres", connStr)
+		db, err := sql.Open("postgres", p.connectionString())
 		if err != nil {
 			return err
 		}
@@ -87,6 +85,7 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (luaRows *lua.LTable, resultErr
 			case []byte:
 				luaRow.RawSetInt(i+1, lua.LString(string(converted)))
 			default:
+				log.Printf("[ERROR] postgresql unknown type (value: `%#v`, converted: `%#v`)\n", value, converted)
 				luaRow.RawSetInt(i+1, lua.LNil) // на самом деле ничего не значит
 			}
 		}
