@@ -61,8 +61,8 @@ while true do
 
   -- если активно pg_stat_statements
   if use_pg_stat_statements then
-    local rows, err = main_db:query("select sum(total_time)*1000 as times, sum(calls) as calls, \
-      sum(blk_read_time)*1000 as disk_read_time, sum(blk_write_time)*1000 as disk_write_time, sum(total_time - blk_read_time - blk_write_time)*1000 as other_time \
+    local rows, err = main_db:query("select sum(total_time)/1000 as times, sum(calls) as calls, \
+      sum(blk_read_time)/1000 as disk_read_time, sum(blk_write_time)/1000 as disk_write_time, sum(total_time - blk_read_time - blk_write_time)/1000 as other_time \
       from public.pg_stat_statements;")
     if not err then
       local current_times, current_calls, current_time = rows[1][1], rows[1][2], time.unix()
