@@ -40,7 +40,7 @@ while true do
     local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff \
       (pg_catalog.pg_current_xlog_location(),'0/00000000')")
     if err then error(err) end
-    metrics.set_counter_speed('postgres.wal.write', rows[1][1])
+    metrics.set_counter_speed('postgres.wal.write_bytes_in_sec', rows[1][1])
   end
 
   -- < 9.6 только! (количество файлов pg_xlog)
@@ -63,6 +63,7 @@ while true do
           state_value = row[2]
         end
       end
+      if state == 'idle in transaction' then state = 'idle_in_transaction' end
       metrics.set('postgres.connections.'..state, state_value)
     end
   end
