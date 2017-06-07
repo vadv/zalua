@@ -134,7 +134,7 @@ while true do
     local prev_hit, prev_read = previous_values['blks_hit'], previous_values['blks_read']
     if prev_hit then
       local hit_rate, diff_hit, diff_read = 100, (current_hit - prev_hit), (current_read - prev_read)
-      if (diff_hit > 0) and (diff_read > g0) then
+      if (diff_hit > 0) and (diff_read > 0) then
         hit_rate = 100*diff_hit/(diff_read+diff_hit)
       end
       metrics.set('postgres.blks.hit_rate', hit_rate)
