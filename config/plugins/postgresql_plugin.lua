@@ -132,14 +132,14 @@ while true do
     local current_hit, current_read = rows[1][1], rows[1][2]
     local prev_hit, prev_read = previous_values['blks_hit'], previous_values['blks_read']
     if prev_hit then
-      local diff_hit, diff_read = (current_hit - prev_hit), (current_read - prev_read)
+      local hit_rate, diff_hit, diff_read = 1, (current_hit - prev_hit), (current_read - prev_read)
       if (diff_hit > 0) and (diff_read > 0) then
-        local hit = diff_hit/(diff_read+diff_hit)
-        metrics.set('postgres.blks.hit_rate', hit)
-        metrics.set_counter_speed('postgres.blks.hit', current_hit)
-        metrics.set_counter_speed('postgres.blks.read', current_read)
+        hit_rate = diff_hit/(diff_read+diff_hit)
       end
+      metrics.set('postgres.blks.hit_rate', hit_rate)
     end
+    metrics.set_counter_speed('postgres.blks.hit', current_hit)
+    metrics.set_counter_speed('postgres.blks.read', current_read)
     previous_values['blks_hit'], previous_values['blks_read'] = current_hit, current_read
   end
 
