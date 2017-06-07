@@ -50,10 +50,10 @@ while true do
 
   if pg_is_in_recovery then
     -- is slave
-    local rows, err = main_db:query("select extract(epoch from now()-pg_last_xact_replay_timestamp())")
+    local rows, err = main_db:query("elect extract(epoch from pg_last_xact_replay_timestamp())")
     if err then error(err) end
-    local replication_lag = rows[1][1]
-    if replication_lag < 0 then replication_lag = 0 end -- pg_last_xact_replay_timestamp было вычисленено после составления снапшота, отставание минимальное
+    -- брать во внимание что pg_last_xact_replay_timestamp это значение из времени мастера
+    local replication_lag = time.unix() - rows[1][1] -- возможно clock_timestamp()
     metrics.set('postgres.wal.last_apply', replication_lag)
   else
     -- is master
