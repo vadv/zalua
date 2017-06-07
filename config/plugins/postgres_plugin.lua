@@ -127,8 +127,11 @@ while true do
     end
   end
 
-  -- хит по блокам за последнее время
-  local rows, err = main_db:query("select sum(blks_hit) as blks_hit, sum(blks_read) as blks_read from pg_catalog.pg_stat_database")
+  -- хит по блокам и статистика по строкам
+  local rows, err = main_db:query("select sum(blks_hit) as blks_hit, sum(blks_read) as blks_read, \
+      sum(tup_returned) as tup_returned, sum(tup_fetched) as tup_fetched, sum(tup_inserted) as tup_inserted, \
+      sum(tup_updated) as tup_updated, sum(tup_deleted) as tup_deleted \
+    from pg_catalog.pg_stat_database")
   if not err then
     local current_hit, current_read = rows[1][1], rows[1][2]
     local prev_hit, prev_read = previous_values['blks_hit'], previous_values['blks_read']
@@ -142,6 +145,11 @@ while true do
     metrics.set_counter_speed('postgres.blks.hit', current_hit)
     metrics.set_counter_speed('postgres.blks.read', current_read)
     previous_values['blks_hit'], previous_values['blks_read'] = current_hit, current_read
+    metrics.set_counter_speed('postgres.rows.returned', rows[1][3])
+    metrics.set_counter_speed('postgres.rows.fetched', rows[1][4])
+    metrics.set_counter_speed('postgres.rows.inserted', rows[1][5])
+    metrics.set_counter_speed('postgres.rows.updated', rows[1][6])
+    metrics.set_counter_speed('postgres.rows.deleted', rows[1][7])
   end
 
   -- выполняем из главной базы общий запрос на размеры и статусы
