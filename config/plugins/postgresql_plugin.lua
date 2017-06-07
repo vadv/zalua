@@ -14,6 +14,8 @@ local connection = {
 }
 if os.stat('/var/run/postgresql/.s.PGSQL.5432') then connection.host = '/var/run/postgresql' end
 
+local previous_values = {}
+
 -- открываем "главный" коннект
 local main_db, err = postgres.open(connection)
 if err then error(err) end
@@ -23,7 +25,7 @@ local _, err = main_db:query("set statement_timeout to '10s'")
 if err then error(err) end
 
 -- пробуем активировать расширение pg_stat_statements
-local use_pg_stat_statements, pg_stat_statment_values = false, {}
+local use_pg_stat_statements = false
 local rows, err = main_db:query("select count(*) from pg_catalog.pg_extension where extname = 'pg_stat_statements'")
 if not err then
   if rows[1][1] == 1 then
@@ -66,10 +68,10 @@ while true do
       from public.pg_stat_statements;")
     if not err then
       local current_times, current_calls, current_time = rows[1][1], rows[1][2], time.unix()
-      metrics.set_counter_speed('postgres.time.disk_read_time_ms', rows[1][3])
-      metrics.set_counter_speed('postgres.time.disk_write_time_ms', rows[1][4])
-      metrics.set_counter_speed('postgres.time.other_time_ms', rows[1][5])
-      local prev_times, prev_calls, prev_time = pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time']
+      metrics.set_counter_speed('postgres.time.disk_read_ms', rows[1][3])
+      metrics.set_counter_speed('postgres.time.disk_write_ms', rows[1][4])
+      metrics.set_counter_speed('postgres.time.other_ms', rows[1][5])
+      local prev_times, prev_calls, prev_time = previous_values['total_time'], previous_values['calls'], previous_values['time']
       if prev_times then
         local diff_times, diff_calls, diff_time = (current_times - prev_times), (current_calls - prev_calls), (current_time - prev_time)
         if (diff_times > 0) and (diff_calls > 0) and (diff_time > 0) then
@@ -77,13 +79,17 @@ while true do
           metrics.set('postgres.queries.avg_time_ms', diff_times/diff_calls)
         end
       end
-      pg_stat_statment_values['total_time'], pg_stat_statment_values['calls'], pg_stat_statment_values['time'] = current_times, current_calls, current_time
+      previous_values['total_time'], previous_values['calls'], previous_values['time'] = current_times, current_calls, current_time
     end
   end
 
   -- < 9.6 только! (количество файлов pg_xlog)
   local rows, err = main_db:query("select count(*) from pg_catalog.pg_ls_dir('pg_xlog')")
   if not err then metrics.set('postgres.wal.count', rows[1][1]) end
+
+  -- для >= 9.6 только
+  local rows, err = main_db:query("select count(*) from pg_catalog.pg_stat_activity where wait_event is not null")
+  if not err then metrics.set('postgres.connections.waiting', rows[1][1]) end
 
   -- кол-во autovacuum воркеров
   local rows, err = main_db:query("select count(*) from pg_catalog.pg_stat_activity where \
@@ -104,6 +110,37 @@ while true do
       if state == 'idle in transaction' then state = 'idle_in_transaction' end
       metrics.set('postgres.connections.'..state, state_value)
     end
+  end
+
+  -- кол-во локов
+  local rows, err = main_db:query("select lower(mode), count(mode) FROM pg_catalog.pg_locks group by 1")
+  if not err then
+    for _, lock in pairs({'accessshare', 'rowshare', 'rowexclusive', 'shareupdateexclusive', 'share', 'sharerowexclusive', 'exclusive', 'accessexclusive'}) do
+      local lock_value = 0
+      for _, row in pairs(rows) do
+        if (row[1] == lock) then
+          lock_value = row[2]
+        end
+      end
+      metrics.set('postgres.locks.'..lock, lock_value)
+    end
+  end
+
+  -- хит по блокам за последнее время
+  local rows, err = main_db:query("select sum(blks_hit) as blks_hit, sum(blks_read) as blks_read from pg_catalog.pg_stat_database")
+  if not err then
+    local current_hit, current_read = rows[1][1], rows[1][2]
+    local prev_hit, prev_read = previous_values['blks_hit'], previous_values['blks_read']
+    if prev_hit then
+      local diff_hit, diff_read = (current_hit - prev_hit), (current_read - prev_read)
+      if (diff_hit > 0) and (diff_read > 0) then
+        local hit = diff_hit/(diff_read+diff_hit)
+        metrics.set('postgres.blks.hit_rate', hit)
+        metrics.set_counter_speed('postgres.blks.hit', current_hit)
+        metrics.set_counter_speed('postgres.blks.read', current_read)
+      end
+    end
+    previous_values['blks_hit'], previous_values['blks_read'] = current_hit, current_read
   end
 
   -- выполняем из главной базы общий запрос на размеры и статусы
