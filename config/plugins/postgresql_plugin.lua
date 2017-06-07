@@ -116,9 +116,9 @@ while true do
   local rows, err = main_db:query("select lower(mode), count(mode) FROM pg_catalog.pg_locks group by 1")
   if not err then
     for _, lock in pairs({'accessshare', 'rowshare', 'rowexclusive', 'shareupdateexclusive', 'share', 'sharerowexclusive', 'exclusive', 'accessexclusive'}) do
-      local lock_value = 0
+      local lock_full_name, lock_value = lock..'lock', 0
       for _, row in pairs(rows) do
-        if (row[1] == lock) then
+        if (row[1] == lock_full_name) then
           lock_value = row[2]
         end
       end
@@ -132,9 +132,9 @@ while true do
     local current_hit, current_read = rows[1][1], rows[1][2]
     local prev_hit, prev_read = previous_values['blks_hit'], previous_values['blks_read']
     if prev_hit then
-      local hit_rate, diff_hit, diff_read = 1, (current_hit - prev_hit), (current_read - prev_read)
+      local hit_rate, diff_hit, diff_read = 100, (current_hit - prev_hit), (current_read - prev_read)
       if (diff_hit > 0) and (diff_read > 0) then
-        hit_rate = diff_hit/(diff_read+diff_hit)
+        hit_rate = 100*diff_hit/(diff_read+diff_hit)
       end
       metrics.set('postgres.blks.hit_rate', hit_rate)
     end
