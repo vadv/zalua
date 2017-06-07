@@ -25,6 +25,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("postgres", postgres)
 	L.SetField(postgres, "open", L.NewFunction(config.dslNewPgsqlConn))
 	L.SetField(postgres, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"close": config.dslPgsqlClose,
 		"query": config.dslPgsqlQuery,
 	}))
 

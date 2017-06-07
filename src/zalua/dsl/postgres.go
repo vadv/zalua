@@ -170,3 +170,12 @@ func (c *dslConfig) dslPgsqlQuery(L *lua.LState) int {
 	L.Push(row_count)
 	return 4
 }
+
+// закрытие соединения
+func (c *dslConfig) dslPgsqlClose(L *lua.LState) int {
+	conn := checkPgsqlConn(L)
+	if conn.db != nil {
+		conn.db.Close()
+	}
+	return 0
+}

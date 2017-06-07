@@ -18,11 +18,11 @@ local previous_values = {}
 
 -- открываем "главный" коннект
 local main_db, err = postgres.open(connection)
-if err then error(err) end
+if err then main_db:close(); error(err) end
 
 -- устанавливаем лимит на выполнение любого запроса 10s
 local _, err = main_db:query("set statement_timeout to '10s'")
-if err then error(err) end
+if err then main_db:close(); error(err) end
 
 -- пробуем активировать расширение pg_stat_statements
 local use_pg_stat_statements = false
@@ -45,20 +45,20 @@ while true do
 
   -- in recovery (is slave)?
   local rows, err = main_db:query("select pg_catalog.pg_is_in_recovery() as pg_is_in_recovery")
-  if err then error(err) end
+  if err then main_db:close(); error(err) end
   local pg_is_in_recovery = rows[1][1]
 
   if pg_is_in_recovery then
     -- is slave
-    local rows, err = main_db:query("elect extract(epoch from pg_last_xact_replay_timestamp())")
-    if err then error(err) end
+    local rows, err = main_db:query("select extract(epoch from pg_last_xact_replay_timestamp())")
+    if err then main_db:close(); error(err) end
     -- брать во внимание что pg_last_xact_replay_timestamp это значение из времени мастера
     local replication_lag = time.unix() - rows[1][1] -- возможно clock_timestamp()
     metrics.set('postgres.wal.last_apply', replication_lag)
   else
     -- is master
     local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff (pg_catalog.pg_current_xlog_location(),'0/00000000')")
-    if err then error(err) end
+    if err then main_db:close(); error(err) end
     metrics.set_counter_speed('postgres.wal.write_bytes_in_sec', rows[1][1])
   end
 
@@ -148,7 +148,7 @@ while true do
   local rows, err = main_db:query("select \
       datname, pg_catalog.pg_database_size(datname::text), pg_catalog.age(datfrozenxid) \
       from pg_catalog.pg_database where datistemplate = false")
-  if err then error(err) end
+  if err then main_db:close(); error(err) end
   for _, row in pairs(rows) do
     local dbname, size, age = row[1], row[2], row[3]
     metrics.set('postgres.database.size['..dbname..']', size)
