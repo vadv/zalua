@@ -52,11 +52,12 @@ while true do
     -- is slave
     local rows, err = main_db:query("select extract(epoch from now()-pg_last_xact_replay_timestamp())")
     if err then error(err) end
-    metrics.set('postgres.wal.last_apply', rows[1][1])
+    local replication_lag = rows[1][1]
+    if replication_lag < 0 then replication_lag = 0 end -- pg_last_xact_replay_timestamp было вычисленено после составления снапшота, отставание минимальное
+    metrics.set('postgres.wal.last_apply', replication_lag)
   else
     -- is master
-    local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff \
-      (pg_catalog.pg_current_xlog_location(),'0/00000000')")
+    local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff (pg_catalog.pg_current_xlog_location(),'0/00000000')")
     if err then error(err) end
     metrics.set_counter_speed('postgres.wal.write_bytes_in_sec', rows[1][1])
   end
