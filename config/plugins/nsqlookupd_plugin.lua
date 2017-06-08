@@ -1,4 +1,4 @@
-local nsqlookupd = { host = "127.0.0.1:4161" }
+local nsqlookupd = { host = "http://127.0.0.1:4161" }
 
 function nsqlookupd.get(url)
   print(nsqlookupd)
@@ -6,7 +6,7 @@ function nsqlookupd.get(url)
   local result, err = http.get(nsqlookupd.host..url)
   if err then metrics.set("nsqlookupd.problem", url.." availability: "..err); return nil; end
   if not (result.code == 200) then metrics.set("nsqlookupd.problem", url.." response code: "..tostring(result.code)); return nil; end
-  return response.body
+  return result.body
 end
 
 function nsqlookupd.ping()
