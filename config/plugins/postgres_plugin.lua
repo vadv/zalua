@@ -18,7 +18,7 @@ local previous_values = {}
 
 -- открываем "главный" коннект
 local main_db, err = postgres.open(connection)
-if err then main_db:close(); error(err) end
+if err then error(err) end
 
 -- устанавливаем лимит на выполнение любого запроса 10s
 local _, err = main_db:query("set statement_timeout to '10s'")

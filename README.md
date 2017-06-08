@@ -97,8 +97,13 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `filepath.ext(filename)` порт golang filepath.Ext()
     * `filepath.glob(mask)` порт golang filepath.Glob(), в случае ошибки возращает nil.
 
+* *http*:
+    * `result = http.get(url)` может сделать raise с ошибкой, возвращает `result = {body, code}`, захардкожен 10секундный таймаут.
+    * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
+    * `http.escape(url)` порт url.QueryEscape(query)
+
 * *os*:
-    * `os.stat(filename)` os.stat возвращает таблицу с полями `{size, is_dir, mod_time}`, в случае ошибки возращает nil.
+    * `stat = os.stat(filename)` os.stat возвращает таблицу с полями `stat = {size, is_dir, mod_time}`, в случае ошибки возращает nil.
     * `os.pagesize()` возвращет pagesize
 
 * *time*:

@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -57,7 +58,11 @@ func setSpeed(L *lua.LState, counter bool) int {
 				// должны пропустить если counter и счетчик провернулся
 			} else {
 				value := float64(time.Second) * diff / float64(now-lastTime)
-				storage.Box.Set(metric, strconv.FormatFloat(value, 'f', 2, 64), ttl)
+				valueStr := strconv.FormatFloat(value, 'f', 2, 64)
+				if math.Abs(value) < 0.01 {
+					valueStr = strconv.FormatFloat(value, 'f', 4, 64)
+				}
+				storage.Box.Set(metric, valueStr, ttl)
 			}
 		}
 	}
@@ -83,7 +88,11 @@ func (c *dslConfig) dslStorageSet(L *lua.LState) int {
 		val = string(luaStr)
 	} else {
 		if luaFloat, ok := luaVal.(lua.LNumber); ok {
-			val = strconv.FormatFloat(float64(luaFloat), 'f', 2, 64)
+			value := float64(luaFloat)
+			val = strconv.FormatFloat(value, 'f', 2, 64)
+			if math.Abs(value) < 0.01 {
+				val = strconv.FormatFloat(value, 'f', 6, 64)
+			}
 		} else {
 			L.RaiseError("argument #2 must be string or number")
 		}
