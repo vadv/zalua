@@ -60,6 +60,12 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(time, "unix_nano", L.NewFunction(config.dslTimeUnixNano))
 	L.SetField(time, "sleep", L.NewFunction(config.dslTimeSleep))
 
+	http := L.NewTypeMetatable("http")
+	L.SetGlobal("http", http)
+	L.SetField(http, "get", L.NewFunction(config.dslHttpGet))
+	L.SetField(http, "escape", L.NewFunction(config.dslHttpEscape))
+	L.SetField(http, "unescape", L.NewFunction(config.dslHttpUnEscape))
+
 	strings := L.NewTypeMetatable("strings")
 	L.SetGlobal("strings", strings)
 	L.SetField(strings, "split", L.NewFunction(config.dslStringsSplit))

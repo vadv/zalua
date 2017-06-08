@@ -98,7 +98,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `filepath.glob(mask)` порт golang filepath.Glob(), в случае ошибки возращает nil.
 
 * *http*:
-    * `result = http.get(url)` может сделать raise с ошибкой, возвращает `result = {body, code}`, захардкожен 10секундный таймаут.
+    * `result = http.get(url)` может сделать raise с ошибкой, возвращает `result = {body, code}`,g захардкожен 10секундный таймаут.
     * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
     * `http.escape(url)` порт url.QueryEscape(query)
 

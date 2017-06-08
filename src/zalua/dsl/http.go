@@ -42,7 +42,7 @@ func (d *dslConfig) dslHttpEscape(L *lua.LState) int {
 	return 1
 }
 
-func dslHttpUnEscape(L *lua.LState) int {
+func (d *dslConfig) dslHttpUnEscape(L *lua.LState) int {
 	query := L.CheckString(1)
 	url, err := url.QueryUnescape(query)
 	if err != nil {
