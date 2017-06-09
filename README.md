@@ -42,15 +42,15 @@ $ zalua -p
 
 
 $ zalua -m
-system.disk.read_bytes[/video]          23454385.653432         1495748781
-system.disk.read_ops[/video]            46.463452               1495748781
-system.disk.utilization[/video]         51.029993               1495748781
-system.disk.write_bytes[/video]         6872556.411429          1495748781
-system.disk.write_ops[/video]           25.724433               1495748781
+system.disk.read_bytes[/video]          23454385.65         1495748781
+system.disk.read_ops[/video]            46.46               1495748781
+system.disk.utilization[/video]         51.02               1495748781
+system.disk.write_bytes[/video]         6872556.41          1495748781
+system.disk.write_ops[/video]           25.72               1495748781
 runit.problem           Found problem with runit services: 'nginx' has linked, but isn't running   1495748781
 
 $ zalua -g system.tcp.active
-0.000000
+0.00
 ```
 
 ### Пример UserParameter:

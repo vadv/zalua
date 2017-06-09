@@ -1,3 +1,5 @@
+if not os.stat('/etc/sv/nsqlookupd') then return end
+
 local nsqlookupd = { host = "http://127.0.0.1:4161" }
 
 function nsqlookupd.get(url)
