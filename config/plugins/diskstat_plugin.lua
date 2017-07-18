@@ -162,6 +162,7 @@ while true do
     metrics.set_counter_speed("system.disk.read_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"])
     metrics.set_counter_speed("system.disk.write_bytes_in_sec["..mountpoint.."]", all_stats[dev]["write_bytes"])
     metrics.set_counter_speed("system.disk.write_ops_in_sec["..mountpoint.."]", all_stats[dev]["write_ops"])
+    metrics.set_counter_speed("system.disk.all_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"] + all_stats[dev]["write_ops"])
   end
 
   metrics.set("system.disk.discovery", json.encode({data = discovery}))
