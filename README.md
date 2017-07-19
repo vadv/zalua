@@ -36,9 +36,9 @@
 
 ```
 $ zalua -p
-/etc/zalua/plugins/bad_plugin.lua         false           /etc/zalua/plugins/buddyinfo_plugin.lua at 1: parse error
-/etc/zalua/plugins/numa_plugin.lua              false           <no error>
-/etc/zalua/plugins/snmp_plugin.lua              true            <no error>
+/etc/zalua/plugins/bad_plugin.lua    false           /etc/zalua/plugins/buddyinfo_plugin.lua at 1: parse error
+/etc/zalua/plugins/numa_plugin.lua   false           <no error>
+/etc/zalua/plugins/snmp_plugin.lua   true            <no error>
 
 
 $ zalua -m

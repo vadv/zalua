@@ -2,7 +2,6 @@ package settings
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
@@ -52,11 +51,8 @@ func MaxSizeRequest() int64 {
 	return int64(maxSizeRequest)
 }
 
-var (
-	random   = rand.New(rand.NewSource(time.Now().Unix()))
-	serverId = random.Int63n(10000)
-)
+var random = time.Now().UnixNano()
 
 func ServerId() string {
-	return fmt.Sprintf("server-id-%d", serverId)
+	return fmt.Sprintf("server-id-%d", random)
 }
