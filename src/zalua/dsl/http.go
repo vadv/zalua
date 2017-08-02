@@ -9,13 +9,21 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+const USER_AGENT = `zalua`
+
 func (d *dslConfig) dslHttpGet(L *lua.LState) int {
 	url := L.CheckString(1)
 	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
-	response, err := client.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		L.RaiseError("http create request: %s\n", err.Error())
+		return 0
+	}
+	req.Header.Set("User-Agent", USER_AGENT)
+	response, err := client.Do(req)
 	if err != nil {
 		L.RaiseError("http error: %s\n", err.Error())
 		return 0
