@@ -123,14 +123,13 @@ func main() {
 	}
 	switch result {
 	case protocol.UNKNOWN_METRIC:
-		// fmt.Fprintf(os.Stderr, "unknown metric '%s'\n", os.Args[2])
-		fmt.Fprintf(os.Stdout, "")
+		fmt.Fprintf(os.Stderr, "zalua: unknown metric '%s'\n", os.Args[2])
 		os.Exit(11)
 	case protocol.UNKNOWN_COMMAND:
-		fmt.Fprintf(os.Stderr, "unknown command\n")
+		fmt.Fprintf(os.Stderr, "zalua: unknown command\n")
 		os.Exit(12)
 	case protocol.COMMAND_ERROR:
-		fmt.Fprintf(os.Stderr, "command error\n")
+		fmt.Fprintf(os.Stderr, "zalua: command error\n")
 		os.Exit(13)
 	case protocol.EMPTY:
 		fmt.Fprintf(os.Stdout, "")
