@@ -37,7 +37,6 @@ while true do
     if problem == '' then problem = 'ok' else problem = 'Found problem with runit services: '..problem end
     metrics.set('runit.problem', problem)
   else
-    -- метрика будет unsupported, что снизит нагрузку на zabbix-сервер
     metrics.set('runit.problem', 'ok')
   end
   time.sleep(60)
