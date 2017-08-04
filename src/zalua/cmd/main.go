@@ -123,7 +123,8 @@ func main() {
 	}
 	switch result {
 	case protocol.UNKNOWN_METRIC:
-		fmt.Fprintf(os.Stderr, "unknown metric '%s'\n", os.Args[2])
+		// fmt.Fprintf(os.Stderr, "unknown metric '%s'\n", os.Args[2])
+		fmt.Fprintf(os.Stdout, "")
 		os.Exit(11)
 	case protocol.UNKNOWN_COMMAND:
 		fmt.Fprintf(os.Stderr, "unknown command\n")
