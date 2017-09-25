@@ -31,6 +31,7 @@ while true do
       metrics.set_counter_speed('system.tcp.passive', row['PassiveOpens']) -- The number of passive TCP openings per second
       metrics.set_counter_speed('system.tcp.failed', row['AttemptFails']) -- The number of failed TCP connection attempts per second
       metrics.set_counter_speed('system.tcp.resets', row['EstabResets']) -- The number of TCP connection resets
+      metrics.set_counter_speed('system.tcp.retransmit', row['RetransSegs'])
       metrics.set('system.tcp.established', row['CurrEstab']) -- The number of currently open connections
     end
   end
