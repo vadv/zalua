@@ -49,8 +49,8 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(filepath, "ext", L.NewFunction(config.dslFilepathExt))
 	L.SetField(filepath, "glob", L.NewFunction(config.dslFilepathGlob))
 
-	os := L.NewTypeMetatable("os")
-	L.SetGlobal("os", os)
+	os := L.NewTypeMetatable("goos")
+	L.SetGlobal("goos", os)
 	L.SetField(os, "stat", L.NewFunction(config.dslOsStat))
 	L.SetField(os, "pagesize", L.NewFunction(config.dslOsPagesize))
 

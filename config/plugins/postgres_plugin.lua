@@ -1,7 +1,7 @@
 -- немного тупого "auto-discovery" для включения плагина
 local enabled = false
-if os.stat('/var/lib/postgresql') then enabled = true end
-if os.stat('/var/lib/pgsql') then enabled = true end
+if goos.stat('/var/lib/postgresql') then enabled = true end
+if goos.stat('/var/lib/pgsql') then enabled = true end
 if not enabled then return end
 
 -- для работы данного плагина необходимо
@@ -12,7 +12,7 @@ local connection = {
   user     = 'root',
   database = 'postgres'
 }
-if os.stat('/var/run/postgresql/.s.PGSQL.5432') then connection.host = '/var/run/postgresql' end
+if goos.stat('/var/run/postgresql/.s.PGSQL.5432') then connection.host = '/var/run/postgresql' end
 
 local previous_values = {}
 

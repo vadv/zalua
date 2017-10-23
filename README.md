@@ -102,9 +102,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
     * `http.escape(url)` порт url.QueryEscape(query)
 
-* *os*:
-    * `stat = os.stat(filename)` os.stat возвращает таблицу с полями `stat = {size, is_dir, mod_time}`, в случае ошибки возращает nil.
-    * `os.pagesize()` возвращет pagesize
+* *goos*:
+    * `stat = goos.stat(filename)` goos.stat возвращает таблицу с полями `stat = {size, is_dir, mod_time}`, в случае ошибки возращает nil.
+    * `goos.pagesize()` возвращет pagesize
 
 * *time*:
     * `time.sleep(N)` проспать N секунд

@@ -8,12 +8,12 @@ while true do
   local problem = '' -- пытаемся сократить кол-во сообщений в zabbix
 
   -- если есть /etc/service
-  if os.stat('/etc/service') then
+  if goos.stat('/etc/service') then
     for _, file in pairs(filepath.glob('/etc/service/*')) do
 
       local name = file:match('^/etc/service/(%S+)$')
       local run = (ioutil.readfile(file..'/supervise/stat') == "run\n")
-      local uptime, stat = 0, os.stat(file..'/supervise/pid')
+      local uptime, stat = 0, goos.stat(file..'/supervise/pid')
       if stat then uptime = (time.unix() - stat.mod_time) end
 
       if run then

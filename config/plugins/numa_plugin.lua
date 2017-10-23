@@ -1,4 +1,4 @@
-if not os.stat('/sys/devices/system/node/node1/numastat') then return end
+if not goos.stat('/sys/devices/system/node/node1/numastat') then return end
 
 -- основной loop
 while true do
