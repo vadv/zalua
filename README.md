@@ -81,6 +81,11 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `rows, err, column_count, row_count = db:query()` выполнить запрос
     * `db:close()` закрыть коннект
 
+* *tac*:
+    * `scanner = tac.open("filepath")` открыть файл
+    * `scanner:line()` получить последнюю линию (closure), в случае отсутвия таковой вернеться nil
+    * `scanner:close()` закрыть файл
+
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 

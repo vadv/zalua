@@ -21,6 +21,14 @@ func Register(config *dslConfig, L *lua.LState) {
 		"is_running": config.dslPluginIsRunning,
 	}))
 
+	tacScanner := L.NewTypeMetatable("tac")
+	L.SetGlobal("tac", tacScanner)
+	L.SetField(tacScanner, "open", L.NewFunction(config.dslTacOpen))
+	L.SetField(tacScanner, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"line":  config.dslTacLine,
+		"close": config.dslTacClose,
+	}))
+
 	postgres := L.NewTypeMetatable("postgres")
 	L.SetGlobal("postgres", postgres)
 	L.SetField(postgres, "open", L.NewFunction(config.dslNewPgsqlConn))
