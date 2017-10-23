@@ -23,7 +23,7 @@ rpm:
     - /build/RPMS/x86_64/*.rpm
 
   tags:
-  - docker
+  - lowcapacity
 
   only:
   - tags
