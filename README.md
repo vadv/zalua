@@ -81,6 +81,11 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `rows, err, column_count, row_count = db:query()` выполнить запрос
     * `db:close()` закрыть коннект
 
+* *tcp*:
+    * `telnet, err = tcp.open("xxx:xxx")` открыть коннект
+    * `err = telnet:write("xxxx")` записать в коннект
+    * `telnet:close()` закрыть коннект
+
 * *tac*:
     * `scanner = tac.open("filepath")` открыть файл
     * `scanner:line()` получить последнюю линию (closure), в случае отсутвия таковой вернеться nil

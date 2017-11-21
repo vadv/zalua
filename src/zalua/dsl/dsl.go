@@ -37,6 +37,14 @@ func Register(config *dslConfig, L *lua.LState) {
 		"query": config.dslPgsqlQuery,
 	}))
 
+	tcp := L.NewTypeMetatable("tcp")
+	L.SetGlobal("tcp", tcp)
+	L.SetField(tcp, "open", L.NewFunction(config.dslNewTCPConn))
+	L.SetField(tcp, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"close": config.dslTCPClose,
+		"write": config.dslTCPWrite,
+	}))
+
 	storage := L.NewTypeMetatable("metrics")
 	L.SetGlobal("metrics", storage)
 	L.SetField(storage, "get", L.NewFunction(config.dslStorageGet))
