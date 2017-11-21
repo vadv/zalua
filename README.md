@@ -68,13 +68,13 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `p:is_running()` запущен или нет плагин
     * `p:error()` текст последний ошибки или nil
 
-* *metric*:
-    * `metric.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
-    * `metric.set_speed(key, val, <ttl>)` тоже самое, но считает скорость измерения
-    * `metric.set_counter_speed(key, val, <ttl>)` тоже самое, но считает только положительную скорость измерения
-    * `metric.get(key)` получить значение метрики key
-    * `metric.list()` список метрик
-    * `metric.delete(key)` удалить значение метрики key
+* *metrics*:
+    * `metrics.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
+    * `metrics.set_speed(key, val, <ttl>)` тоже самое, но считает скорость измерения
+    * `metrics.set_counter_speed(key, val, <ttl>)` тоже самое, но считает только положительную скорость измерения
+    * `metrics.get(key)` получить значение метрики key
+    * `metrics.list()` список `{key:"xxx", value:"xxx", at:xxx}`
+    * `metrics.delete(key)` удалить значение метрики key
 
 * *postgres*:
     * `db, err = postgres.open({database="xxx", host="127.0.0.1", user="xxx", password="xxx"})` открыть коннект

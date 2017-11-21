@@ -108,8 +108,12 @@ func (c *dslConfig) dslStorageSet(L *lua.LState) int {
 func (c *dslConfig) dslStorageList(L *lua.LState) int {
 	list := storage.Box.List()
 	result := L.CreateTable(len(list), 0)
-	for _, key := range list {
-		result.Append(lua.LString(key))
+	for key, item := range list {
+		t := L.CreateTable(3, 0)
+		L.SetField(t, "key", lua.LString(key))
+		L.SetField(t, "value", lua.LString(item.Value))
+		L.SetField(t, "at", lua.LNumber(item.CreatedAt))
+		result.Append(t)
 	}
 	L.Push(result)
 	return 1

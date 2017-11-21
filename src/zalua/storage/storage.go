@@ -14,28 +14,28 @@ import (
 
 var Box = newStorage()
 
-type storageItem struct {
+type StorageItem struct {
 	Value     string `json:"value"`
 	CreatedAt int64  `json:"created_at"`
 	TTL       int64  `json:"ttl"`
 }
 
-func (s *storageItem) valid() bool {
+func (s *StorageItem) valid() bool {
 	return s.CreatedAt+s.TTL > time.Now().Unix()
 }
 
 type storage struct {
 	sync.Mutex
-	data map[string]*storageItem
+	data map[string]*StorageItem
 }
 
 // создание storage
 func newStorage() *storage {
-	result := &storage{data: make(map[string]*storageItem, 0)}
+	result := &storage{data: make(map[string]*StorageItem, 0)}
 	// загрузка storage из файла
 	if _, err := os.Stat(settings.StoragePath()); err == nil {
 		if data, err := ioutil.ReadFile(settings.StoragePath()); err == nil {
-			list := make(map[string]*storageItem, 0)
+			list := make(map[string]*StorageItem, 0)
 			if json.Unmarshal(data, &list); err == nil {
 				for key, item := range list {
 					if !item.valid() {
@@ -91,7 +91,7 @@ func (p *storage) Set(key, val string, ttl int64) {
 	p.Lock()
 	defer p.Unlock()
 
-	p.data[key] = &storageItem{
+	p.data[key] = &StorageItem{
 		Value:     val,
 		CreatedAt: time.Now().Unix(),
 		TTL:       ttl,
@@ -124,14 +124,14 @@ func (p *storage) Delete(key string) {
 }
 
 // список всех ключей и значений
-func (p *storage) List() []string {
+func (p *storage) List() map[string]*StorageItem {
 	p.Lock()
 	defer p.Unlock()
 
-	result := []string{}
+	result := make(map[string]*StorageItem, 0)
 	for key, item := range p.data {
 		if item.valid() {
-			result = append(result, fmt.Sprintf("%s\t\t%s\t\t%d", key, item.Value, item.CreatedAt))
+			result[key] = item
 		}
 	}
 	return result

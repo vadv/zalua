@@ -50,7 +50,7 @@ func (c *dslConfig) dslNewTCPConn(L *lua.LState) int {
 	return 1
 }
 
-// выполнение запроса
+// выполнение записи
 func (c *dslConfig) dslTCPWrite(L *lua.LState) int {
 	conn := checkTCPConn(L)
 	data := L.CheckString(2)
@@ -71,6 +71,7 @@ func (c *dslConfig) dslTCPWrite(L *lua.LState) int {
 func (c *dslConfig) dslTCPClose(L *lua.LState) int {
 	conn := checkTCPConn(L)
 	if conn.tcp != nil {
+		log.Printf("[INFO] Close tcp connection to `%s`\n", conn.address)
 		conn.tcp.Close()
 	}
 	return 0
