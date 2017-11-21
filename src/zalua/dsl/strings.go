@@ -17,3 +17,19 @@ func (d *dslConfig) dslStringsSplit(L *lua.LState) int {
 	L.Push(result)
 	return 1
 }
+
+func (d *dslConfig) dslStringsHasPrefix(L *lua.LState) int {
+	str1 := L.CheckString(1)
+	str2 := L.CheckString(2)
+	result := strings.HasPrefix(str1, str2)
+	L.Push(lua.LBool(result))
+	return 1
+}
+
+func (d *dslConfig) dslStringsHasSuffix(L *lua.LState) int {
+	str1 := L.CheckString(1)
+	str2 := L.CheckString(2)
+	result := strings.HasSuffix(str1, str2)
+	L.Push(lua.LBool(result))
+	return 1
+}

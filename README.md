@@ -96,6 +96,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 * *strings*:
     * `strings.split(str, delim)` порт golang strings.split()
+    * `strings.has_prefix(str1, str2)` порт golang strings.hasprefix()
+    * `strings.has_suffix(str1, str2)` порт golang strings.hassuffix()
 
 * *json*:
     * `json.encode(N)` lua-table в string
