@@ -33,3 +33,11 @@ func (d *dslConfig) dslStringsHasSuffix(L *lua.LState) int {
 	L.Push(lua.LBool(result))
 	return 1
 }
+
+func (d *dslConfig) dslStringsTrim(L *lua.LState) int {
+	str1 := L.CheckString(1)
+	str2 := L.CheckString(2)
+	result := strings.Trim(str1, str2)
+	L.Push(lua.LString(result))
+	return 1
+}

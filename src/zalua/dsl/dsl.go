@@ -87,6 +87,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(strings, "split", L.NewFunction(config.dslStringsSplit))
 	L.SetField(strings, "has_prefix", L.NewFunction(config.dslStringsHasPrefix))
 	L.SetField(strings, "has_suffix", L.NewFunction(config.dslStringsHasSuffix))
+	L.SetField(strings, "trim", L.NewFunction(config.dslStringsTrim))
 
 	log := L.NewTypeMetatable("log")
 	L.SetGlobal("log", log)
