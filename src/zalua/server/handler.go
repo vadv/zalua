@@ -70,8 +70,12 @@ func ClientHandler(conn net.Conn) {
 	// list of metrics
 	case request == protocol.LIST_OF_METRICS:
 		list := storage.Box.List()
-		sort.Strings(list)
-		response = strings.Join(list, "\n")
+		stringList := []string{}
+		for key, item := range list {
+			stringList = append(stringList, fmt.Sprintf("%s\t\t%s\t\t%d", key, item.Value, item.CreatedAt))
+		}
+		sort.Strings(stringList)
+		response = strings.Join(stringList, "\n")
 
 	// list of running plugins
 	case request == protocol.LIST_OF_PLUGINS:
