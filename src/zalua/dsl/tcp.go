@@ -54,6 +54,7 @@ func (c *dslConfig) dslNewTCPConn(L *lua.LState) int {
 func (c *dslConfig) dslTCPWrite(L *lua.LState) int {
 	conn := checkTCPConn(L)
 	data := L.CheckString(2)
+	conn.tcp.SetWriteDeadline(time.Now().Add(5 * time.Second))
 	count, err := conn.tcp.Write([]byte(data))
 	if err != nil {
 		L.Push(lua.LString(fmt.Sprintf("write to `%s`: %s", conn.address, err.Error())))
