@@ -42,12 +42,13 @@ func (c *dslConfig) dslNewPluginParser(L *lua.LState) int {
 		L.Push(lua.LString(err.Error()))
 		return 2
 	}
-	newPluginParser, ok := s.(pluginParserInterface)
+	f, ok := s.(func() pluginParserInterface)
 	if !ok {
 		L.Push(lua.LNil)
 		L.Push(lua.LString("doesn't implement interface parser"))
 		return 2
 	}
+	newPluginParser := f()
 	ud := L.NewUserData()
 	ud.Value = &pluginParser{parser: newPluginParser, filename: filename}
 	L.SetMetatable(ud, L.GetTypeMetatable("parser"))

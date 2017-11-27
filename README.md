@@ -94,7 +94,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 
-* *parser*: позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с интерфейсом: `type Parser interface { ProcessData(string) (map[string]string, error) }`
+* *parser*: позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с функцией которая вернет интерфейс: `type Parser interface { ProcessData(string) (map[string]string, error) }`
     * `p, err = parser.load(filename, symbol_name)` загрузить плагин с экспортированным именем `symbol_name` plugin_parser.so
     * `table, err = p:parse(str)` обработать строчку
 
