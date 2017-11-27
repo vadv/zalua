@@ -8,7 +8,7 @@ import (
 )
 
 type pluginParserInterface interface {
-	ProcessData(string) (*lua.LTable, error)
+	ProcessData(string) (map[string]string, error)
 }
 
 type pluginParser struct {
@@ -66,6 +66,10 @@ func (c *dslConfig) dslPluginParserParse(L *lua.LState) int {
 		L.Push(lua.LString(err.Error()))
 		return 2
 	}
-	L.Push(t)
+	luaRow := L.CreateTable(0, len(t))
+	for key, value := range t {
+		luaRow.RawSetString(key, lua.LString(value))
+	}
+	L.Push(luaRow)
 	return 1
 }
