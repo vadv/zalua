@@ -45,6 +45,13 @@ func Register(config *dslConfig, L *lua.LState) {
 		"write": config.dslTCPWrite,
 	}))
 
+	plugin_parser := L.NewTypeMetatable("plugin_parser")
+	L.SetGlobal("plugin_parser", plugin_parser)
+	L.SetField(plugin_parser, "load", L.NewFunction(config.dslNewPluginParser))
+	L.SetField(tcp, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"parse": config.dslPluginParserParse,
+	}))
+
 	storage := L.NewTypeMetatable("metrics")
 	L.SetGlobal("metrics", storage)
 	L.SetField(storage, "get", L.NewFunction(config.dslStorageGet))

@@ -94,6 +94,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 
+* *plugin_parser*: позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с интерфейсом: `type Parser interface { ProcessData(string) (*lua.LTable, error) }`
+    * `parser, err = plugin_parser.load(filename, symbol_name)` загрузить плагин с экспортированным именем `symbol_name` plugin_parser.so
+    * `table, err = parser:parse(str)` обработать строчку
+
 * *strings*:
     * `strings.split(str, delim)` порт golang strings.split()
     * `strings.has_prefix(str1, str2)` порт golang strings.hasprefix()
