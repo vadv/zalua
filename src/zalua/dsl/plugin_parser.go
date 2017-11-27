@@ -7,13 +7,13 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-type pluginParserInterface interface {
+type PluginParserInterface interface {
 	ProcessData(string) (map[string]string, error)
 }
 
 type pluginParser struct {
 	filename string
-	parser   pluginParserInterface
+	parser   PluginParserInterface
 }
 
 // получение plugins из lua-state
@@ -29,26 +29,23 @@ func checkPluginParser(L *lua.LState) *pluginParser {
 // загрузка парсера
 func (c *dslConfig) dslNewPluginParser(L *lua.LState) int {
 	filename := L.CheckString(1)
-	symbolName := L.CheckString(2)
+	symbolName := `NewParser`
+	if L.GetTop() > 1 {
+		symbolName = L.CheckString(2)
+	}
 	p, err := goplugin.Open(filename)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
 		return 2
 	}
-	s, err := p.Lookup(symbolName)
+	sym, err := p.Lookup(symbolName)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
 		return 2
 	}
-	f, ok := s.(func() pluginParserInterface)
-	if !ok {
-		L.Push(lua.LNil)
-		L.Push(lua.LString("doesn't implement interface parser"))
-		return 2
-	}
-	newPluginParser := f()
+	newPluginParser := sym.(PluginParserInterface)
 	ud := L.NewUserData()
 	ud.Value = &pluginParser{parser: newPluginParser, filename: filename}
 	L.SetMetatable(ud, L.GetTypeMetatable("parser"))
@@ -66,6 +63,10 @@ func (c *dslConfig) dslPluginParserParse(L *lua.LState) int {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
 		return 2
+	}
+	if t == nil {
+		L.Push(lua.LNil)
+		return 1
 	}
 	luaRow := L.CreateTable(0, len(t))
 	for key, value := range t {
