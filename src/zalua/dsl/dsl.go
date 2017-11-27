@@ -48,7 +48,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	dslPluginParser := L.NewTypeMetatable("parser")
 	L.SetGlobal("parser", dslPluginParser)
 	L.SetField(dslPluginParser, "load", L.NewFunction(config.dslNewPluginParser))
-	L.SetField(tcp, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+	L.SetField(dslPluginParser, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"parse": config.dslPluginParserParse,
 	}))
 

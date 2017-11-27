@@ -15,7 +15,7 @@ rpm:
   - yum install -y epel-release
   - yum install -y wget make git gzip rpm-build nc
   - yum groupinstall -y "Development tools"
-  - wget https://redirector.gvt1.com/edgedl/go/go1.8.5.linux-amd64.tar.gz -O /tmp/go.linux-amd64.tar.gz
+  - wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz -O /tmp/go.linux-amd64.tar.gz
   - tar xvf /tmp/go.linux-amd64.tar.gz -C /usr/local
   - ln -s /usr/local/go/bin/go* /usr/local/bin/
   - make docker
