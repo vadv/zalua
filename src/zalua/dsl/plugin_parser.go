@@ -50,7 +50,7 @@ func (c *dslConfig) dslNewPluginParser(L *lua.LState) int {
 	}
 	ud := L.NewUserData()
 	ud.Value = &pluginParser{parser: newPluginParser, filename: filename}
-	L.SetMetatable(ud, L.GetTypeMetatable("plugin_parser"))
+	L.SetMetatable(ud, L.GetTypeMetatable("parser"))
 	L.Push(ud)
 	log.Printf("[INFO] Loaded parser plugin `%s` from `%s`\n", symbolName, filename)
 	return 1
