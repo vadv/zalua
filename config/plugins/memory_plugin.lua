@@ -15,18 +15,18 @@ while true do
   for key, val in pairs(row) do
     if key == "MemFree" then
       free = val
-      metrics.set("sys.memory.free", tostring(val))
+      metrics.set("system.memory.free", tostring(val))
     elseif key == "MemTotal" then
       total = val
     elseif key == "MemShared" then
-      metrics.set("sys.memory.shared", tostring(val))
+      metrics.set("system.memory.shared", tostring(val))
     elseif key == "Buffers" then
-      metrics.set("sys.memory.buffers", tostring(val))
+      metrics.set("system.memory.buffers", tostring(val))
     elseif key == "Cached" then
       cached = val
-      metrics.set("sys.memory.cached", tostring(val))
+      metrics.set("system.memory.cached", tostring(val))
     end
   end
-  metrics.set("sys.memory.other", tostring(total-free-cached))
+  metrics.set("system.memory.other", tostring(total-free-cached))
   time.sleep(60)
 end
