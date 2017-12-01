@@ -11,22 +11,24 @@ end
 -- основной loop
 while true do
   local row = process("/proc/meminfo")
-  local total, free, cached = 0, 0, 0
+  local total, free, cached, shared, buffers = 0, 0, 0, 0, 0
   for key, val in pairs(row) do
     if key == "MemFree" then
       free = val
-      metrics.set("system.memory.free", tostring(val))
     elseif key == "MemTotal" then
       total = val
     elseif key == "MemShared" then
-      metrics.set("system.memory.shared", tostring(val))
+      shared = val
     elseif key == "Buffers" then
-      metrics.set("system.memory.buffers", tostring(val))
+      buffers = val
     elseif key == "Cached" then
       cached = val
-      metrics.set("system.memory.cached", tostring(val))
     end
   end
+  metrics.set("system.memory.free", tostring(free))
+  metrics.set("system.memory.cached", tostring(cached))
+  metrics.set("system.memory.shared", tostring(shared))
+  metrics.set("system.memory.buffers", tostring(buffers))
   metrics.set("system.memory.other", tostring(total-free-cached))
   time.sleep(60)
 end
