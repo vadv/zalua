@@ -24,7 +24,7 @@ func ListenLoop(clientHandle func(net.Conn)) error {
 	if err != nil {
 		return err
 	}
-	if err := os.Chmod(settings.SocketPath(), 0755); err != nil {
+	if err := os.Chmod(settings.SocketPath(), 0777); err != nil {
 		return err
 	}
 	result := &server{fd: fd}
