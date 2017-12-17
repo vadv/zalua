@@ -48,25 +48,29 @@ const luaPathTypeName = "xmlpath.path"
 const luaIterTypeName = "xmlpath.iter"
 
 func registerXmlType(L *lua.LState, module *lua.LTable) {
+
 	//reg node
 	nodemt := L.NewTypeMetatable(luaNodeTypeName)
 	L.SetField(module, "node", nodemt)
 	L.SetField(nodemt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"string": nodeXmlString,
 	}))
+
 	//reg path
 	pathmt := L.NewTypeMetatable(luaPathTypeName)
 	L.SetField(module, "path", pathmt)
 	L.SetField(pathmt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"iter": xmlIter,
 	}))
+
 	//reg iter
 	itermt := L.NewTypeMetatable(luaIterTypeName)
 	L.SetField(module, "iter", itermt)
 	L.SetField(itermt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		//"next": next,
+		"next": xmlNext,
 		"node": xmlNode,
 	}))
+
 }
 
 func newXmlNode(L *lua.LState, n *xmlpath.Node) *lua.LUserData {
@@ -77,6 +81,7 @@ func newXmlNode(L *lua.LState, n *xmlpath.Node) *lua.LUserData {
 	L.SetMetatable(ud, L.GetTypeMetatable(luaNodeTypeName))
 	return ud
 }
+
 func checkXmlNode(L *lua.LState) *typeXmlNode {
 	ud := L.CheckUserData(1)
 	if v, ok := ud.Value.(*typeXmlNode); ok {
@@ -85,6 +90,7 @@ func checkXmlNode(L *lua.LState) *typeXmlNode {
 	L.ArgError(1, "node expected")
 	return nil
 }
+
 func newXmlPath(L *lua.LState, p *xmlpath.Path) *lua.LUserData {
 	ud := L.NewUserData()
 	ud.Value = &typeXmlPath{
@@ -93,6 +99,7 @@ func newXmlPath(L *lua.LState, p *xmlpath.Path) *lua.LUserData {
 	L.SetMetatable(ud, L.GetTypeMetatable(luaPathTypeName))
 	return ud
 }
+
 func checkXmlPath(L *lua.LState) *typeXmlPath {
 	ud := L.CheckUserData(1)
 	if v, ok := ud.Value.(*typeXmlPath); ok {
@@ -101,6 +108,7 @@ func checkXmlPath(L *lua.LState) *typeXmlPath {
 	L.ArgError(1, "path expected")
 	return nil
 }
+
 func newXmlIter(L *lua.LState, i *xmlpath.Iter) *lua.LUserData {
 	ud := L.NewUserData()
 	ud.Value = &typeXmlIter{
@@ -109,6 +117,7 @@ func newXmlIter(L *lua.LState, i *xmlpath.Iter) *lua.LUserData {
 	L.SetMetatable(ud, L.GetTypeMetatable(luaIterTypeName))
 	return ud
 }
+
 func checkXmlIter(L *lua.LState) *typeXmlIter {
 	ud := L.CheckUserData(1)
 	if v, ok := ud.Value.(*typeXmlIter); ok {
@@ -142,11 +151,11 @@ func xmlIter(L *lua.LState) int {
 
 //support lua standard iterator
 //hasNext := iter.next()
-// func next(L *lua.LState) int {
-//  iter := checkXmlIter(L)
-//  L.Push(lua.LBool(iter.base.Next()))
-//  return 1
-// }
+func xmlNext(L *lua.LState) int {
+	iter := checkXmlIter(L)
+	L.Push(lua.LBool(iter.base.Next()))
+	return 1
+}
 
 //node := iter.node()
 func xmlNode(L *lua.LState) int {
