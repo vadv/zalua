@@ -108,24 +108,5 @@ func Register(config *dslConfig, L *lua.LState) {
 
 	xmlPath := L.NewTypeMetatable("xmlpath")
 	L.SetGlobal("xmlpath", xmlPath)
-	L.SetField(xmlPath, "load", L.NewFunction(config.dslXmlLoad))
-	L.SetField(xmlPath, "compile", L.NewFunction(config.dslXmlCompile))
-
-	nodemt := L.NewTypeMetatable(luaNodeTypeName)
-	L.SetField(xmlPath, "node", nodemt)
-	L.SetField(nodemt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"string": nodeXmlString,
-	}))
-
-	pathmt := L.NewTypeMetatable(luaPathTypeName)
-	L.SetField(xmlPath, "path", pathmt)
-	L.SetField(pathmt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"iter": xmlIter,
-	}))
-
-	itermt := L.NewTypeMetatable(luaIterTypeName)
-	L.SetField(xmlPath, "iter", itermt)
-	L.SetField(itermt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"node": xmlNode,
-	}))
+	L.SetField(xmlPath, "parse", L.NewFunction(config.dslXmlParse))
 }

@@ -114,6 +114,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `filepath.ext(filename)` порт golang filepath.Ext()
     * `filepath.glob(mask)` порт golang filepath.Glob(), в случае ошибки возращает nil.
 
+* *xmlpath*:
+    * `table, err = xmlpath.parse(data, path)` возвращает таблицу с обработаной `data` по xmlpath `path`
+
 * *http*:
     * `result = http.get(url)` может сделать raise с ошибкой, возвращает `result = {body, code}`,g захардкожен 10секундный таймаут.
     * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
