@@ -109,7 +109,6 @@ func Register(config *dslConfig, L *lua.LState) {
 	yaml := L.NewTypeMetatable("yaml")
 	L.SetGlobal("yaml", yaml)
 	L.SetField(yaml, "decode", L.NewFunction(config.dslYamlDecode))
-	L.SetField(yaml, "encode", L.NewFunction(config.dslYamlEncode))
 
 	xmlPath := L.NewTypeMetatable("xmlpath")
 	L.SetGlobal("xmlpath", xmlPath)

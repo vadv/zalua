@@ -109,7 +109,6 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `json.decode(N)` string в lua-table
 
 * *yaml*:
-    * `yaml.encode(N)` lua-table в string
     * `yaml.decode(N)` string в lua-table
 
 * *filepath*:
