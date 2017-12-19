@@ -50,11 +50,6 @@ func ClientHandler(conn net.Conn) {
 		return
 	}
 	response := ""
-	log.Printf("[INFO] %s: request: '%s'\n", requestId, request)
-
-	defer func() {
-		log.Printf("[INFO] %s: response: '%s'\n", requestId, response)
-	}()
 
 	switch {
 
