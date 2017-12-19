@@ -106,6 +106,11 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(json, "decode", L.NewFunction(config.dslJsonDecode))
 	L.SetField(json, "encode", L.NewFunction(config.dslJsonEncode))
 
+	yaml := L.NewTypeMetatable("yaml")
+	L.SetGlobal("yaml", yaml)
+	L.SetField(yaml, "decode", L.NewFunction(config.dslYamlDecode))
+	L.SetField(yaml, "encode", L.NewFunction(config.dslYamlEncode))
+
 	xmlPath := L.NewTypeMetatable("xmlpath")
 	L.SetGlobal("xmlpath", xmlPath)
 	L.SetField(xmlPath, "parse", L.NewFunction(config.dslXmlParse))

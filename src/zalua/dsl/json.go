@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	errFunction = errors.New("cannot encode function to JSON")
-	errChannel  = errors.New("cannot encode channel to JSON")
-	errState    = errors.New("cannot encode state to JSON")
-	errUserData = errors.New("cannot encode userdata to JSON")
-	errNested   = errors.New("cannot encode recursively nested tables to JSON")
+	errJsonFunction = errors.New("cannot encode function to JSON")
+	errJsonChannel  = errors.New("cannot encode channel to JSON")
+	errJsonState    = errors.New("cannot encode state to JSON")
+	errJsonUserData = errors.New("cannot encode userdata to JSON")
+	errJsonNested   = errors.New("cannot encode recursively nested tables to JSON")
 )
 
 type jsonValue struct {
@@ -58,15 +58,15 @@ func toJSON(value lua.LValue, visited map[*lua.LTable]bool) (data []byte, err er
 	case lua.LBool:
 		data, err = json.Marshal(converted)
 	case lua.LChannel:
-		err = errChannel
+		err = errJsonChannel
 	case lua.LNumber:
 		data, err = json.Marshal(converted)
 	case *lua.LFunction:
-		err = errFunction
+		err = errJsonFunction
 	case *lua.LNilType:
 		data, err = json.Marshal(converted)
 	case *lua.LState:
-		err = errState
+		err = errJsonState
 	case lua.LString:
 		data, err = json.Marshal(converted)
 	case *lua.LTable:
@@ -74,7 +74,7 @@ func toJSON(value lua.LValue, visited map[*lua.LTable]bool) (data []byte, err er
 		var obj map[string]jsonValue
 
 		if visited[converted] {
-			panic(errNested)
+			panic(errJsonNested)
 		}
 		visited[converted] = true
 
@@ -109,7 +109,7 @@ func toJSON(value lua.LValue, visited map[*lua.LTable]bool) (data []byte, err er
 		}
 	case *lua.LUserData:
 		// TODO: call metatable __tostring?
-		err = errUserData
+		err = errJsonUserData
 	}
 	return
 }

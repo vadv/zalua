@@ -108,6 +108,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `json.encode(N)` lua-table в string
     * `json.decode(N)` string в lua-table
 
+* *yaml*:
+    * `yaml.encode(N)` lua-table в string
+    * `yaml.decode(N)` string в lua-table
+
 * *filepath*:
     * `filepath.base(filename)` порт golang filepath.Base()
     * `filepath.dir(filename)` порт golang filepath.Dir()
