@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -19,20 +20,23 @@ func (d *dslConfig) dslHttpGet(L *lua.LState) int {
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		L.RaiseError("http create request: %s\n", err.Error())
-		return 0
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http create request: %s\n", err.Error())))
+		return 2
 	}
 	req.Header.Set("User-Agent", USER_AGENT)
 	response, err := client.Do(req)
 	if err != nil {
-		L.RaiseError("http error: %s\n", err.Error())
-		return 0
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http error: %s\n", err.Error())))
+		return 2
 	}
 	defer response.Body.Close()
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		L.RaiseError("http read response error: %s\n", err.Error())
-		return 0
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http read response error: %s\n", err.Error())))
+		return 2
 	}
 	// write response
 	result := L.NewTable()

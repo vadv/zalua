@@ -94,7 +94,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 
-* *parser*: позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с переменная которая вернет интерфейс: `type Parser interface { ProcessData(string) (map[string]string, error) }`
+* *parser*:
+    позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с переменная которая вернет интерфейс: `type Parser interface { ProcessData(string) (map[string]string, error) }`
     * `p, err = parser.load(filename.so, variable_name="NewParser")` загрузить плагин с экспортированным именем `variable_name` в filename.so
     * `table, err = p:parse(str)` обработать строчку
 
@@ -121,7 +122,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `table, err = xmlpath.parse(data, path)` возвращает таблицу с обработаной `data` по xmlpath `path`
 
 * *http*:
-    * `result = http.get(url)` может сделать raise с ошибкой, возвращает `result = {body, code}`,g захардкожен 10секундный таймаут.
+    * `result, err = http.get(url)` возвращает `result = {body, code}` и ошибку, захардкожен 10секундный таймаут.
     * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
     * `http.escape(url)` порт url.QueryEscape(query)
 
