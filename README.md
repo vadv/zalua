@@ -123,8 +123,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 
 * *http*:
     * `result, err = http.get(url)` возвращает `result = {body, code}` и ошибку, захардкожен 10секундный таймаут.
-    * `http.unescape(url)` порт  url.QueryUnescape(query), может сделать raise с ошибкой
-    * `http.escape(url)` порт url.QueryEscape(query)
+    * `result, err = http.unescape(url)` порт  url.QueryUnescape(query)
+    * `result = http.escape(url)` порт url.QueryEscape(query)
 
 * *goos*:
     * `stat = goos.stat(filename)` goos.stat возвращает таблицу с полями `stat = {size, is_dir, mod_time}`, в случае ошибки возращает nil.

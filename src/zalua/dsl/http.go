@@ -58,8 +58,9 @@ func (d *dslConfig) dslHttpUnEscape(L *lua.LState) int {
 	query := L.CheckString(1)
 	url, err := url.QueryUnescape(query)
 	if err != nil {
-		L.RaiseError("unescape error: %s\n", err.Error())
-		return 0
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("unescape error: %s\n", err.Error())))
+		return 2
 	}
 	L.Push(lua.LString(url))
 	return 1
