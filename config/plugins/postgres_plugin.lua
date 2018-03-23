@@ -57,6 +57,8 @@ while true do
     metrics.set('postgres.wal.last_apply', replication_lag)
   else
     -- is master
+    local _, err = main_db:query("select txid_current()")
+    if err then main_db:close(); error(err) end
     metrics.set('postgres.wal.last_apply', 0)
     local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff (pg_catalog.pg_current_xlog_location(),'0/00000000')")
     if err then main_db:close(); error(err) end
