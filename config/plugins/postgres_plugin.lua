@@ -57,6 +57,7 @@ while true do
     metrics.set('postgres.wal.last_apply', replication_lag)
   else
     -- is master
+    metrics.set('postgres.wal.last_apply', 0)
     local rows, err = main_db:query("select pg_catalog.pg_xlog_location_diff (pg_catalog.pg_current_xlog_location(),'0/00000000')")
     if err then main_db:close(); error(err) end
     metrics.set_counter_speed('postgres.wal.write_bytes_in_sec', rows[1][1])
