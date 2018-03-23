@@ -19,8 +19,8 @@ rpm:
   - tar xvf /tmp/go.linux-amd64.tar.gz -C /usr/local
   - ln -s /usr/local/go/bin/go* /usr/local/bin/
   - make docker
-  - rsync -aP /build/RPMS/x86_64/*.rpm rsync://repo6.itv.restr.im/infra/6/x86_64/
-  - echo 'infra/6/x86_64' | nc -w5 repo6.itv.restr.im 8008
+  - rsync -aP /build/RPMS/x86_64/*.rpm rsync://repo.itv.restr.im/infra/6/x86_64/
+  - curl http://repo.itv.restr.im/update?repo=infra/6/x86_64
 
   artifacts:
     paths:
