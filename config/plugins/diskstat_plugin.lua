@@ -91,9 +91,6 @@ function calc_value(dev, values)
   local io_sec = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
   if (io_sec > 0) and (ticks > 0) then
     calc_values[dev]["await"] = ticks / io_sec
-  else
-    -- игнорируем проворот счетчика
-    if (io_sec == 0) then calc_values[dev]["await"] = 0 end
   end
 
   -- перетираем предыдущее значение
