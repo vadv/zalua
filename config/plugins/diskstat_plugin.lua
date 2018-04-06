@@ -90,7 +90,7 @@ function calc_value(dev, values)
   local ticks = ((current.rd_ticks_or_wr_sec - previous.rd_ticks_or_wr_sec) + (current.wr_ticks - previous.wr_ticks))
   local io_sec = (current.rd_ios + current.wr_ios) - (previous.rd_ios + previous.wr_ios)
   if (io_sec > 0) and (ticks > 0) then calc_values[dev]["await"] = ticks / io_sec end
-  if (io_sec == 0) or (ticks == 0) then calc_values[dev]["await"] = ticks / io_sec end
+  if (io_sec == 0) or (ticks == 0) then calc_values[dev]["await"] = 0 end
 
 
   -- перетираем предыдущее значение
