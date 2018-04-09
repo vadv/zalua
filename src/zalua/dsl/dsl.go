@@ -101,6 +101,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(log, "error", L.NewFunction(config.dslLogError))
 	L.SetField(log, "info", L.NewFunction(config.dslLogInfo))
 
+	crypto := L.NewTypeMetatable("crypto")
+	L.SetGlobal("crypto", crypto)
+	L.SetField(crypto, "md5", L.NewFunction(config.dslCryptoMD5))
+
 	json := L.NewTypeMetatable("json")
 	L.SetGlobal("json", json)
 	L.SetField(json, "decode", L.NewFunction(config.dslJsonDecode))
