@@ -92,7 +92,7 @@ while true do
       else
 
         -- плагин остановлен и не завершился с ошибкой
-        -- попробуем его запустить позднее, через 10 попыток удаляем
+        -- попробуем его запустить позднее через перезапуск (после 10 попыток)
         local try_count = try_plugins[file]
         if try_count == nil then try_count = 0 end
         try_count = try_count + 1
