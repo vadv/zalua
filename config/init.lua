@@ -4,7 +4,7 @@ local plugins = {} -- {filename= {plugin = p, md5 = md5}, ...}
 local try_plugins = {} -- {filename = count_of_try}
 
 -- удаление плагина
-function delete_plugin(file)
+function stop_and_delete_plugin(file)
   local metadata = plugins[file]
   if not(metadata == nil) then metadata["plugin"]:stop() end
   -- пересоздаем плагины, проще способа удалить по ключу не нашел
@@ -59,8 +59,7 @@ function re_run_if_needed()
   for file, found in pairs(found_files) do
     if not found then
       local metadata = plugins[file]
-      metadata["plugin"]:stop()
-      delete_plugin(file)
+      stop_and_delete_plugin(file)
     end
   end
 
@@ -93,7 +92,7 @@ while true do
         if try_count == nil then try_count = 0 end
         -- отправляем на рестарт
         if try_count > 10 then
-          delete_plugin(file)
+          stop_and_delete_plugin(file)
           try_count = 0
         end
         try_count = try_count + 1
