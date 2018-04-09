@@ -97,7 +97,7 @@ func (c *dslConfig) dslNewPlugin(L *lua.LState) int {
 	ud.Value = p
 	L.SetMetatable(ud, L.GetTypeMetatable("plugin"))
 	L.Push(ud)
-	log.Printf("[INFO] Load plugin from file: `%s`\n", p.filename)
+	log.Printf("[INFO] Start plugin: `%s`\n", p.filename)
 	allPlugins.insertPlugin(p)
 	return 1
 }
@@ -139,6 +139,7 @@ func (c *dslConfig) dslPluginIsRunning(L *lua.LState) int {
 // остановка плагина
 func (c *dslConfig) dslPluginStop(L *lua.LState) int {
 	p := checkPlugin(L)
+	log.Printf("[INFO] Stop plugin: `%s`\n", p.filename)
 	p.state.DoString(`error("stop")`)
 	return 0
 }

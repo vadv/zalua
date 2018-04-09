@@ -66,13 +66,15 @@ function re_run_if_needed()
 
 end
 
+-- первоначальный запуск
+re_run_if_needed()
+
 -- супервизор для плагинов
 while true do
   time.sleep(5)
-
-  re_run_if_needed()
   local error_count = 0
 
+  re_run_if_needed()
   -- проверка статусов всех плагинов
   for file, metadata in pairs(plugins) do
     local p = metadata["plugin"]
@@ -86,15 +88,16 @@ while true do
         metrics.set("zalua.error.last", err)
       else
         -- плагин остановлен и не завершился с ошибкой
-        -- попробуем его запустить позднее через перезапуск (после 10 попыток)
+        -- попробуем его запустить позднее через перезапуск (после минуты)
         local try_count = try_plugins[file]
         if try_count == nil then try_count = 0 end
-        try_count = try_count + 1
         -- отправляем на рестарт
         if try_count > 10 then
           delete_plugin(file)
-          try_plugins[file] = 0
+          try_count = 0
         end
+        try_count = try_count + 1
+        try_plugins[file] = try_count
 
       end
     end
