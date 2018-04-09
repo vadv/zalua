@@ -3,7 +3,6 @@ package server
 import (
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	lua "github.com/yuin/gopher-lua"
@@ -23,7 +22,7 @@ func doInit() {
 	log.Printf("[INFO] Load settings file %s\n", settings.InitPath())
 	state := lua.NewState()
 	dsl.Register(dsl.NewConfig(), state)
-	if err := state.DoFile(settings.InitPath()); err != nil && !strings.HasPrefix(err.Error(), "stop_plugin") {
+	if err := state.DoFile(settings.InitPath()); err != nil {
 		log.Printf("[FATAL] Settings file: %s\n", err.Error())
 		os.Exit(20)
 	}
