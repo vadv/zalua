@@ -6,7 +6,7 @@ local try_plugins = {} -- {filename = count_of_try}
 -- удаление плагина
 function delete_plugin(file)
   local metadata = plugins[file]
-  if not(metadata == nil) then metadata[file]:stop() end
+  if not(metadata == nil) then metadata["plugin"]:stop() end
   -- пересоздаем плагины, проще способа удалить по ключу не нашел
   local new_plugins = {}
   for old_file, old_metadata in pairs(plugins) do
@@ -24,7 +24,6 @@ function re_run_plugin_from_file(file)
   -- старт плагина
   if metadata == nil then
     metadata = {}
-    log.info("run plugin: "..file)
     local p = plugin.new(file)
     metadata["plugin"] = p
     metadata["md5"] = current_md5
@@ -35,11 +34,10 @@ function re_run_plugin_from_file(file)
 
   -- если файл изменился - останавливаем старый и запускаем новый
   if not(metadata["md5"] == current_md5) then
-    log.info("stop plugin: "..file.." with md5: "..metadata["md5"])
     metadata["plugin"]:stop()
     local p = plugin.new(file)
     metadata["plugin"] = p
-    log.info("start plugin: "..file.." with md5: "..current_md5)
+    metadata["md5"] = current_md5
     p:run()
     plugins[file] = metadata
   end
@@ -49,20 +47,19 @@ end
 -- запуск и остановка плагинов
 function re_run_if_needed()
 
-  local all_files = {}
-  for file, _ in pairs(plugins) do all_files[file] = false end
+  local found_files = {}
+  for file, _ in pairs(plugins) do found_files[file] = false end
+
   for _, file in pairs(filepath.glob(plugins_dir.."/*_plugin.lua")) do
-    all_files[file] = true
+    found_files[file] = true
     re_run_plugin_from_file(file)
   end
 
   -- нужно остановить те, что не найдены
-  for file, found in pairs(plugins) do
+  for file, found in pairs(found_files) do
     if not found then
-      log.info("delete unknown plugin: "..file)
       local metadata = plugins[file]
-      log.info("stop plugin: "..file.." with md5: "..metadata["md5"])
-      metadata[file]:stop()
+      metadata["plugin"]:stop()
       delete_plugin(file)
     end
   end
@@ -82,15 +79,12 @@ while true do
     if not p:is_running() then
       local err = p:error()
       if err then
-
         -- плагин не запущен, и завершился с ошибкой
         log.error(err)
-        log.info("start plugin: "..file.." with md5: "..metadata["md5"])
         p:run()
         error_count = error_count + 1
         metrics.set("zalua.error.last", err)
       else
-
         -- плагин остановлен и не завершился с ошибкой
         -- попробуем его запустить позднее через перезапуск (после 10 попыток)
         local try_count = try_plugins[file]

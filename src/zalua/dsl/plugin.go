@@ -97,7 +97,7 @@ func (c *dslConfig) dslNewPlugin(L *lua.LState) int {
 	ud.Value = p
 	L.SetMetatable(ud, L.GetTypeMetatable("plugin"))
 	L.Push(ud)
-	log.Printf("[INFO] Load plugin `%s`\n", p.filename)
+	log.Printf("[INFO] Load plugin from file: `%s`\n", p.filename)
 	allPlugins.insertPlugin(p)
 	return 1
 }
