@@ -139,7 +139,7 @@ func (c *dslConfig) dslPluginIsRunning(L *lua.LState) int {
 // остановка плагина
 func (c *dslConfig) dslPluginStop(L *lua.LState) int {
 	p := checkPlugin(L)
-	p.state.RaiseError("stop")
+	p.state.RaiseError("stop_plugin")
 	return 0
 }
 

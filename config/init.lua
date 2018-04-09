@@ -1,15 +1,29 @@
 local current_file = debug.getinfo(1).source
 local plugins_dir = filepath.dir(current_file).."/".."plugins"
-local plugins = {}
+local plugins = {} -- {filename= {plugin = p, md5 = md5}, ...}
+local try_plugins = {} -- {filename = count_of_try}
 
--- (пе)загрузка конкретного плагина
+-- удаление плагина
+function delete_plugin(file)
+  local metadata = plugins[file]
+  if not(metadata == nil) then metadata[file]:stop() end
+  -- пересоздаем плагины, проще способа удалить по ключу не нашел
+  local new_plugins = {}
+  for old_file, old_metadata in pairs(plugins) do
+    if not(old_file == file) then new_plugins[old_file] = old_metadata end
+  end
+  plugins = new_plugins
+end
+
+-- (пере)загрузка конкретного плагина
 function re_run_plugin_from_file(file)
 
   local metadata = plugins[file]
-  local current_md5 = crypto.md5(ioutil.read_file(file))
+  local current_md5 = crypto.md5(ioutil.readfile(file))
 
   -- старт плагина
   if metadata == nil then
+    metadata = {}
     log.info("run plugin: "..file)
     local p = plugin.new(file)
     metadata["plugin"] = p
@@ -32,7 +46,7 @@ function re_run_plugin_from_file(file)
 
 end
 
--- запуск и остановка всех плагинов
+-- запуск и остановка плагинов
 function re_run_if_needed()
 
   local all_files = {}
@@ -49,7 +63,7 @@ function re_run_if_needed()
       local metadata = plugins[file]
       log.info("stop plugin: "..file.." with md5: "..metadata["md5"])
       metadata[file]:stop()
-      table.remove(plugins, file)
+      delete_plugin(file)
     end
   end
 
@@ -68,6 +82,7 @@ while true do
     if not p:is_running() then
       local err = p:error()
       if err then
+
         -- плагин не запущен, и завершился с ошибкой
         log.error(err)
         log.info("start plugin: "..file.." with md5: "..metadata["md5"])
@@ -75,8 +90,18 @@ while true do
         error_count = error_count + 1
         metrics.set("zalua.error.last", err)
       else
-        -- плагин остановлен и не завершился с ошибкой, удаляем его из списка
-        table.remove(plugins, file)
+
+        -- плагин остановлен и не завершился с ошибкой
+        -- попробуем его запустить позднее, через 10 попыток удаляем
+        local try_count = try_plugins[file]
+        if try_count == nil then try_count = 0 end
+        try_count = try_count + 1
+        -- отправляем на рестарт
+        if try_count > 10 then
+          delete_plugin(file)
+          try_plugins[file] = 0
+        end
+
       end
     end
   end
