@@ -21,3 +21,15 @@ func (d *dslConfig) dslTimeSleep(L *lua.LState) int {
 	time.Sleep(time.Duration(val) * time.Second)
 	return 0
 }
+
+func (d *dslConfig) dslTimeParse(L *lua.LState) int {
+	layout, value := L.CheckString(1), L.CheckString(2)
+	result, err := time.Parse(layout, value)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+	L.Push(lua.LNumber(result.UTC().Unix()))
+	return 1
+}

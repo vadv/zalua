@@ -134,6 +134,7 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `time.sleep(N)` проспать N секунд
     * `time.unix()` время в секундах
     * `time.unix_nano()` время в наносекундах
+    * `time.parse("2006-Jan-02", "2018-Mar-02")` golang порт time.Parse(), возвращает unixts и ошибку
 
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error
