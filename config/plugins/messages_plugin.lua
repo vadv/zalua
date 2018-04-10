@@ -5,8 +5,9 @@ while true do
   local min_time = os.time()-(8*60*60)
   local count_oom, count_segfault = 0, 0
 
-  local scanner = tac.open(filename)
+  local scanner = tac.open("/var/log/messages")
   while true do
+    local line = scanner:line()
     if line == nil then break end
     -- отрезаем первые символы в которых находиться время и прибавляем год
     local time_value = line:sub(0, 15)
@@ -22,7 +23,7 @@ while true do
 
   local messages = "ok"
   if count_oom + count_segfault > 0 then
-    messages = "Найдено " .. count_oom .. " проблем с OOM, и " .. count_segfault .. " проблем с segfault за последние 8 часов."
+    messages = "Найдено проблем с OOM: " .. count_oom .. ", проблем с segfault: ".. count_segfault .." за последние 8 часов."
   end
   metrics.set("system.messages.problem", messages, 10*60)
 

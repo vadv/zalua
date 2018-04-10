@@ -83,6 +83,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(time, "unix", L.NewFunction(config.dslTimeUnix))
 	L.SetField(time, "unix_nano", L.NewFunction(config.dslTimeUnixNano))
 	L.SetField(time, "sleep", L.NewFunction(config.dslTimeSleep))
+	L.SetField(time, "parse", L.NewFunction(config.dslTimeParse))
 
 	http := L.NewTypeMetatable("http")
 	L.SetGlobal("http", http)
