@@ -2,7 +2,7 @@ local syslog_layout = "Jan  2 15:04:05 2006"
 
 while true do
 
-  local min_time = os.time()-(8*60*60)
+  local min_time = os.time()-(24*60*60)
   local count_oom, count_segfault = 0, 0
 
   local scanner = tac.open("/var/log/messages")
@@ -23,7 +23,7 @@ while true do
 
   local messages = "ok"
   if count_oom + count_segfault > 0 then
-    messages = "Найдено проблем с OOM: " .. count_oom .. ", проблем с segfault: ".. count_segfault .." за последние 8 часов."
+    messages = "Найдено проблем с OOM: " .. count_oom .. ", проблем с segfault: ".. count_segfault .." за последние 24 часов."
   end
   metrics.set("system.messages.problem", messages, 10*60)
 
