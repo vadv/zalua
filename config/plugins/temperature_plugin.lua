@@ -1,3 +1,11 @@
+local enabled = false
+for _, file in ipairs(filepath.glob("/sys/bus/platform/devices/coretemp*/temp*_input")) do
+  log.info("found coretemp file: "..file..", start plugin")
+  enabled = true
+  break
+end
+if not enabled then return end
+
 function get_max_temp()
   local data = {}
   for _, file in ipairs(filepath.glob("/sys/bus/platform/devices/coretemp*/temp*_input")) do

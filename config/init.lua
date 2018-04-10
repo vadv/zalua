@@ -1,3 +1,8 @@
+-- этот init-файл обеспечивает запуск всех плагинов в выше лежащей директории "/plugin/*_plugin.lua":
+-- * рестарт плагина в случае его модификации (md5)
+-- * стоп плагина если он был удален (runit-like)
+-- * запуск плагина если он появился в директории (runit-like)
+
 local current_file = debug.getinfo(1).source
 local plugins_dir = filepath.dir(current_file).."/".."plugins"
 local plugins = {} -- {filename= {plugin = p, md5 = md5}, ...}
