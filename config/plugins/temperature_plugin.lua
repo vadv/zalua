@@ -16,10 +16,21 @@ function get_max_temp()
   return data[#data]
 end
 
+function get_crit_temp()
+  local data = {}
+  for _, file in ipairs(filepath.glob("/sys/bus/platform/devices/coretemp*/temp*_crit")) do
+    local temp = tonumber(ioutil.readfile(file))/1000
+    table.insert(data, temp)
+  end
+  return data[#data]
+end
+
 -- главный loop
 while true do
   local maxt = get_max_temp()
   metrics.set("system.cpu.temp", maxt)
+  local critt = get_crit_temp()
+  metrics.set("system.cpu.temp_crit", critt)
 
   time.sleep(10)
 end
