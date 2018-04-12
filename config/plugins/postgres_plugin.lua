@@ -126,10 +126,10 @@ while true do
   if not err then
     local msg, count = "", 0
     for _, row in pairs(rows) do
-      msg = msg .. " `" .. row[1] .. "` в состоянии `" .. tostring(row[3]) .. "` и запущено " .. tostring(row[2]) .. " секунд. "
+      msg = msg .. " `" .. row[1] .. "` в состоянии `" .. tostring(row[3]) .. "` и запущен " .. tostring(row[2]) .. " секунд назад. "
       count = count + 1
     end
-    if count > 0 then long_queries_msg = "Найдено ".. tostring(count) .. " транзакци(й) которые запущены давно: ".. msg end
+    if count > 0 then long_queries_msg = "Найдено ".. tostring(count) .. " запрос(ов) которые запущены давно: ".. msg end
   end
   metrics.set('postgres.queries.long', long_queries_msg)
 
