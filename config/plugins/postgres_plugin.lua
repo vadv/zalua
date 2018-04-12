@@ -116,6 +116,23 @@ while true do
     end
   end
 
+  -- долго играющие запросы
+  local long_queries_msg = "ok"
+  local rows, err = main_db:query("select \
+        s.query, extract(epoch from now() - s.query_start)::int as age \
+    from pg_catalog.pg_stat_get_activity(null::integer) s \
+      where not(s.state = 'idle') \
+      and extract(epoch from now() - s.query_start)::int > 4500")
+  if not err then
+    local msg, count = "", 0
+    for _, row in pairs(rows) do
+      msg = msg .. " " .. rows[1]
+      count = count + 1
+    end
+    if count > 0 then long_queries_msg = "Найдено ".. tostring(count) .. " транзакций которые запущены давно: ".. msg end
+  end
+  metrics.set('postgres.queries.long', long_queries_msg)
+
   -- кол-во локов
   local rows, err = main_db:query("select lower(mode), count(mode) FROM pg_catalog.pg_locks group by 1")
   if not err then

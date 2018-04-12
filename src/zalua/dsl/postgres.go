@@ -84,6 +84,8 @@ func parseRows(sqlRows *sql.Rows, L *lua.LState) (luaRows *lua.LTable, resultErr
 				luaRow.RawSetInt(i+1, lua.LString(converted))
 			case []byte:
 				luaRow.RawSetInt(i+1, lua.LString(string(converted)))
+			case nil:
+				luaRow.RawSetInt(i+1, lua.LNil)
 			default:
 				log.Printf("[ERROR] postgresql unknown type (value: `%#v`, converted: `%#v`)\n", value, converted)
 				luaRow.RawSetInt(i+1, lua.LNil) // на самом деле ничего не значит
