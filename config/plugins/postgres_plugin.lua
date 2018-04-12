@@ -119,14 +119,14 @@ while true do
   -- долго играющие запросы
   local long_queries_msg = "ok"
   local rows, err = main_db:query("select \
-        s.query, extract(epoch from now() - s.query_start)::int as age \
+        s.query, extract(epoch from now() - s.query_start)::int as age, s.state \
     from pg_catalog.pg_stat_get_activity(null::integer) s \
       where not(s.state = 'idle') \
       and extract(epoch from now() - s.query_start)::int > 4500")
   if not err then
     local msg, count = "", 0
     for _, row in pairs(rows) do
-      msg = msg .. " `" .. row[1] .. "` "
+      msg = msg .. " `" .. row[1] .. "` в состоянии `" .. tostring(row[3]) .. "` и запущено " .. tostring(row[2]) .. " секунд. "
       count = count + 1
     end
     if count > 0 then long_queries_msg = "Найдено ".. tostring(count) .. " транзакци(й) которые запущены давно: ".. msg end
