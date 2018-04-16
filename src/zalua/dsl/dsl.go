@@ -88,7 +88,7 @@ func Register(config *dslConfig, L *lua.LState) {
 	http := L.NewTypeMetatable("http")
 	L.SetGlobal("http", http)
 	L.SetField(http, "get", L.NewFunction(config.dslHttpGet))
-	L.SetField(http, "post", L.NewFunction(config.dslHttpPostJson))
+	L.SetField(http, "post", L.NewFunction(config.dslHttpPost))
 	L.SetField(http, "escape", L.NewFunction(config.dslHttpEscape))
 	L.SetField(http, "unescape", L.NewFunction(config.dslHttpUnEscape))
 
