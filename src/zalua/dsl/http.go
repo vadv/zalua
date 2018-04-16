@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,6 +26,49 @@ func (d *dslConfig) dslHttpGet(L *lua.LState) int {
 		return 2
 	}
 	req.Header.Set("User-Agent", USER_AGENT)
+	response, err := client.Do(req)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http error: %s\n", err.Error())))
+		return 2
+	}
+	defer response.Body.Close()
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http read response error: %s\n", err.Error())))
+		return 2
+	}
+	// write response
+	result := L.NewTable()
+	L.SetField(result, "code", lua.LNumber(response.StatusCode))
+	L.SetField(result, "body", lua.LString(string(data)))
+	L.SetField(result, "url", lua.LString(url))
+	L.Push(result)
+	return 1
+}
+
+func (d *dslConfig) dslHttpPost(L *lua.LState) int {
+
+	url := L.CheckString(1)
+	body := L.CheckString(2)
+
+	buf := bytes.NewBuffer([]byte(body))
+
+	timeout := time.Duration(10 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	req, err := http.NewRequest("POST", url, buf)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(fmt.Sprintf("http create request: %s\n", err.Error())))
+		return 2
+	}
+
+	req.Header.Set("User-Agent", USER_AGENT)
+	req.Header.Set("Content-Type", "application/json")
+
 	response, err := client.Do(req)
 	if err != nil {
 		L.Push(lua.LNil)
