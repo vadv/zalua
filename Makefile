@@ -16,6 +16,9 @@ $(BINARY): $(SOURCES)
 run: clean $(BINARY)
 	${BINARY}
 
+test:
+	go test -x -v zalua/dsl
+
 tar: clean
 	mkdir -p rpm/SOURCES
 	tar --transform='s,^\.,$(NAME)-$(VERSION),'\

@@ -94,6 +94,16 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *ioutil*:
     * `ioutil.readfile(filename)` вернуть содержимое файла
 
+* *crypto*:
+    * `crypto.md5(string)` вернуть md5 от строки
+
+* *cmd*:
+    * `state, err = cmd.exec(string)` выполнить exec через shell, возвращает `{"code"=0, "stderr"="", "stdout"=""}`
+
+* *goruntime*:
+    * `goruntime.goos` порт runtime.GOOS
+    * `goruntime.goarch` порт runtime.GOARCH
+
 * *parser*:
     позволяет загрузить при помощи https://golang.org/pkg/plugin/ библиотеку с переменная которая вернет интерфейс: `type Parser interface { ProcessData(string) (map[string]string, error) }`
     * `p, err = parser.load(filename.so, variable_name="NewParser")` загрузить плагин с экспортированным именем `variable_name` в filename.so

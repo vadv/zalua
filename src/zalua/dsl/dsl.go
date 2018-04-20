@@ -1,6 +1,10 @@
 package dsl
 
-import lua "github.com/yuin/gopher-lua"
+import (
+	"runtime"
+
+	lua "github.com/yuin/gopher-lua"
+)
 
 type dslConfig struct{}
 
@@ -120,4 +124,13 @@ func Register(config *dslConfig, L *lua.LState) {
 	xmlPath := L.NewTypeMetatable("xmlpath")
 	L.SetGlobal("xmlpath", xmlPath)
 	L.SetField(xmlPath, "parse", L.NewFunction(config.dslXmlParse))
+
+	cmd := L.NewTypeMetatable("cmd")
+	L.SetGlobal("cmd", cmd)
+	L.SetField(cmd, "exec", L.NewFunction(config.dslCmdExec))
+
+	goruntime := L.NewTypeMetatable("goruntime")
+	L.SetGlobal("goruntime", goruntime)
+	L.SetField(goruntime, "goarch", lua.LString(runtime.GOARCH))
+	L.SetField(goruntime, "goos", lua.LString(runtime.GOOS))
 }
