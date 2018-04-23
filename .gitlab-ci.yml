@@ -1,4 +1,4 @@
-image: centos:6
+image: vadv/centos-6-go:1.9.2 
 
 types:
 - build
@@ -11,13 +11,6 @@ rpm:
   type: build
 
   script:
-  - echo -e "[wandisco-Git]\nname=CentOS-6 - Wandisco Git\nbaseurl=http://opensource.wandisco.com/centos/6/git/\$basearch/\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/wandisco-git.repo
-  - yum install -y epel-release
-  - yum install -y wget make git gzip rpm-build nc
-  - yum groupinstall -y "Development tools"
-  - wget https://redirector.gvt1.com/edgedl/go/go1.9.2.linux-amd64.tar.gz -O /tmp/go.linux-amd64.tar.gz
-  - tar xvf /tmp/go.linux-amd64.tar.gz -C /usr/local
-  - ln -s /usr/local/go/bin/go* /usr/local/bin/
   - make docker
   - rsync -aP /build/RPMS/x86_64/*.rpm rsync://repo.itv.restr.im/infra/6/x86_64/
   - curl http://repo.itv.restr.im/update?repo=infra/6/x86_64
