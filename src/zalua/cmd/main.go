@@ -45,6 +45,9 @@ func main() {
 	// тестовый запуск плагина
 	if len(os.Args) > 2 {
 		if os.Args[1] == "-e" || os.Args[1] == "--execute-file" {
+			fd := os.Stdout
+			logger.DupFdToStd(fd)
+			log.SetOutput(fd)
 			state := lua.NewState()
 			dsl.Register(dsl.NewConfig(), state)
 			file := os.Args[2]
