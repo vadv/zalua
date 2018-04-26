@@ -28,6 +28,8 @@
         List of running plugins
 -g, -get, --get, --get-metric, get <metric>
         Get metric value
+-t, --test-plugin, run file
+        Test plugin in file (run dsl from file)
 -ping, --ping, ping
         Ping pong game
 ```

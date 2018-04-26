@@ -5,7 +5,10 @@ import (
 	"log"
 	"os"
 
+	lua "github.com/yuin/gopher-lua"
+
 	"zalua/daemon"
+	"zalua/dsl"
 	"zalua/logger"
 	"zalua/protocol"
 	"zalua/server"
@@ -24,6 +27,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "-m, -metrics, --list-metrics, metrics\n\tList of known metrics\n")
 		fmt.Fprintf(os.Stderr, "-p, -plugins, --plugins, plugins\n\tList of running plugins\n")
 		fmt.Fprintf(os.Stderr, "-g, -get, --get, --get-metric, get <metric>\n\tGet metric value\n")
+		fmt.Fprintf(os.Stderr, "-t, --test-plugin, run file\n\tTest plugin in file (run dsl from file)\n")
 		fmt.Fprintf(os.Stderr, "-ping, --ping, ping\n\tPing pong game\n")
 		os.Exit(1)
 	}
@@ -35,6 +39,19 @@ func main() {
 			os.Exit(1)
 		case "-h", "-help", "--help":
 			help()
+		}
+	}
+
+	// тестовый запуск плагина
+	if len(os.Args) > 2 {
+		if os.Args[1] == "-t" || os.Args[1] == "--test-plugin" {
+			state := lua.NewState()
+			dsl.Register(dsl.NewConfig(), state)
+			file := os.Args[2]
+			if err := state.DoFile(file); err != nil {
+				log.Printf("[FATAL] execute %s: %s\n", file, err.Error())
+			}
+			return
 		}
 	}
 
