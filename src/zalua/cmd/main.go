@@ -23,11 +23,11 @@ func main() {
 	help := func() {
 		fmt.Fprintf(os.Stderr, "%s commands:\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "-v, -version, --version\n\tGet version\n")
+		fmt.Fprintf(os.Stderr, "-e, --execute-file, execute file (without server)\n\tExecute dsl from file (for testing case)\n")
 		fmt.Fprintf(os.Stderr, "-k, -kill, --kill, kill \n\tKill server\n")
 		fmt.Fprintf(os.Stderr, "-m, -metrics, --list-metrics, metrics\n\tList of known metrics\n")
 		fmt.Fprintf(os.Stderr, "-p, -plugins, --plugins, plugins\n\tList of running plugins\n")
 		fmt.Fprintf(os.Stderr, "-g, -get, --get, --get-metric, get <metric>\n\tGet metric value\n")
-		fmt.Fprintf(os.Stderr, "-t, --test-plugin, run file\n\tTest plugin in file (run dsl from file)\n")
 		fmt.Fprintf(os.Stderr, "-ping, --ping, ping\n\tPing pong game\n")
 		os.Exit(1)
 	}
@@ -44,7 +44,7 @@ func main() {
 
 	// тестовый запуск плагина
 	if len(os.Args) > 2 {
-		if os.Args[1] == "-t" || os.Args[1] == "--test-plugin" {
+		if os.Args[1] == "-e" || os.Args[1] == "--execute-file" {
 			state := lua.NewState()
 			dsl.Register(dsl.NewConfig(), state)
 			file := os.Args[2]

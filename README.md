@@ -20,6 +20,8 @@
 ```
 -v, -version, --version
         Get version
+-e, --execute-file, execute file (without server)
+        Execute dsl from file (for testing case)
 -k, -kill, --kill, kill
         Kill server
 -m, -metrics, --list-metrics, metrics
@@ -28,8 +30,6 @@
         List of running plugins
 -g, -get, --get, --get-metric, get <metric>
         Get metric value
--t, --test-plugin, run file
-        Test plugin in file (run dsl from file)
 -ping, --ping, ping
         Ping pong game
 ```
