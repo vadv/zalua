@@ -2,6 +2,7 @@ package settings
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -23,11 +24,17 @@ func SocketPath() string {
 
 // путь до плагинов
 func InitPath() string {
+	if path := os.Getenv("INIT_FILE"); path != `` {
+		initPath = path
+	}
 	return initPath
 }
 
 // путь до файла с логами
 func LogPath() string {
+	if path := os.Getenv("LOG_PATH"); path != `` {
+		logPath = path
+	}
 	return logPath
 }
 

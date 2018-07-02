@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -10,6 +11,8 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+const stopPluginMessage = `plugin was stopped`
+
 type plugin struct {
 	sync.Mutex
 	state       *lua.LState
@@ -18,6 +21,7 @@ type plugin struct {
 	completedAt int64
 	running     bool
 	lastErr     error
+	cancelFunc  context.CancelFunc
 }
 
 type plugins struct {
@@ -57,7 +61,20 @@ func checkPlugin(L *lua.LState) *plugin {
 func (p *plugin) getLastError() error {
 	p.Lock()
 	defer p.Unlock()
+	if err := p.lastErr; err != nil {
+		if strings.Contains(err.Error(), `context canceled`) {
+			return fmt.Errorf(stopPluginMessage)
+		}
+	}
 	return p.lastErr
+}
+
+// получение статуса об остановке
+func (p *plugin) wasStopped() bool {
+	if err := p.getLastError(); err != nil && err.Error() == stopPluginMessage {
+		return true
+	}
+	return false
 }
 
 // получение статуса - запущено или нет
@@ -83,6 +100,9 @@ func (p *plugin) start() {
 	p.lastErr = nil
 	p.startedAt = time.Now().Unix()
 	p.running = true
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	p.state.SetContext(ctx)
+	p.cancelFunc = cancelFunc
 	p.Unlock()
 
 	p.lastErr = p.state.DoFile(p.getFilename())
@@ -140,8 +160,15 @@ func (c *dslConfig) dslPluginIsRunning(L *lua.LState) int {
 func (c *dslConfig) dslPluginStop(L *lua.LState) int {
 	p := checkPlugin(L)
 	log.Printf("[INFO] Stop plugin: `%s`\n", p.filename)
-	p.state.DoString(`error("stop")`)
+	p.cancelFunc()
 	return 0
+}
+
+// плагин был остановлен
+func (c *dslConfig) dslPluginWasStopped(L *lua.LState) int {
+	p := checkPlugin(L)
+	L.Push(lua.LBool(p.wasStopped()))
+	return 1
 }
 
 // список все плагинов

@@ -18,11 +18,12 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("plugin", plugin)
 	L.SetField(plugin, "new", L.NewFunction(config.dslNewPlugin))
 	L.SetField(plugin, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"filename":   config.dslPluginFilename,
-		"run":        config.dslPluginRun,
-		"stop":       config.dslPluginStop,
-		"error":      config.dslPluginError,
-		"is_running": config.dslPluginIsRunning,
+		"filename":    config.dslPluginFilename,
+		"run":         config.dslPluginRun,
+		"stop":        config.dslPluginStop,
+		"error":       config.dslPluginError,
+		"was_stopped": config.dslPluginWasStopped,
+		"is_running":  config.dslPluginIsRunning,
 	}))
 
 	tacScanner := L.NewTypeMetatable("tac")

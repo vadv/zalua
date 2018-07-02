@@ -66,9 +66,10 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *plugin*:
     * `p = plugin.new(filename)` загрузить плагин
     * `p:run()` запустить плагин
-    * `p:stop()` остановить вызвав ошибку stop в плагине
+    * `p:stop()` остановить плагин вызвав ошибку
     * `p:is_running()` запущен или нет плагин
     * `p:error()` текст последний ошибки или nil
+    * `p:was_stopped()` остановлен ли был плагин при помощи stop()
 
 * *metrics*:
     * `metrics.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
