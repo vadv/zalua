@@ -84,6 +84,11 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `rows, err, column_count, row_count = db:query()` выполнить запрос
     * `db:close()` закрыть коннект
 
+* *oracle*:
+    * `db, err = oracle.open("(DESCRIPTION= (ADDRESS=(PROTOCOL=tcp)(HOST=host)(PORT=port)) (CONNECT_DATA= (SERVICE_NAME=service_name) (SERVER=server) (INSTANCE_NAME=instance_name)))")` открыть коннект
+    * `rows, err, column_count, row_count = db:query()` выполнить запрос
+    * `db:close()` закрыть коннект
+
 * *tcp*:
     * `telnet, err = tcp.open("xxx:xxx")` открыть коннект
     * `err = telnet:write("xxxx")` записать в коннект

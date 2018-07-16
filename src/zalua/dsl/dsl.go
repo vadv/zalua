@@ -42,6 +42,14 @@ func Register(config *dslConfig, L *lua.LState) {
 		"query": config.dslPgsqlQuery,
 	}))
 
+	oracle := L.NewTypeMetatable("oracle")
+	L.SetGlobal("oracle", oracle)
+	L.SetField(oracle, "open", L.NewFunction(config.dslNewOracleConn))
+	L.SetField(oracle, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"close": config.dslOracleClose,
+		"query": config.dslOracleQuery,
+	}))
+
 	tcp := L.NewTypeMetatable("tcp")
 	L.SetGlobal("tcp", tcp)
 	L.SetField(tcp, "open", L.NewFunction(config.dslNewTCPConn))
