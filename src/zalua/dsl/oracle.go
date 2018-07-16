@@ -15,7 +15,7 @@ type oracleConn struct {
 
 func (o *oracleConn) connect() error {
 	if o.db == nil {
-		db, err := sql.Open("oracle", o.connString)
+		db, err := sql.Open("goracle", o.connString)
 		if err != nil {
 			return err
 		}
