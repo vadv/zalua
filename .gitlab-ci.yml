@@ -27,7 +27,7 @@ rpm_6:
 
 rpm_7:
 
-  image: vadv/centos-6-go:1.9.5
+  image: vadv/centos-7-go:1.9.5
 
   type: build
 
