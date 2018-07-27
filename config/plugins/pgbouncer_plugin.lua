@@ -1,5 +1,5 @@
 local enabled = false
-if goos.stat('/etc/pgbouncer') then enabled = true end
+if goos.stat('/etc/service/pgbouncer-6432') then enabled = true end
 if not enabled then return end
 
 local connection = {
