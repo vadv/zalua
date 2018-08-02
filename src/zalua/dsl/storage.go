@@ -25,8 +25,8 @@ func (c *dslConfig) dslStorageGet(L *lua.LState) int {
 	}
 
 	if value, ok := storage.Box.Get(key, tags); ok {
-		L.Push(lua.LString(value.Value))
-		L.Push(stringMapsToTable(L, value.Tags))
+		L.Push(lua.LString(value.GetValue()))
+		L.Push(stringMapsToTable(L, value.GetTags()))
 	} else {
 		L.Push(lua.LNil)
 		L.Push(lua.LNil)
@@ -124,12 +124,12 @@ func (c *dslConfig) dslStorageSet(L *lua.LState) int {
 func (c *dslConfig) dslStorageList(L *lua.LState) int {
 	list := storage.Box.List()
 	result := L.CreateTable(len(list), 0)
-	for key, item := range list {
+	for _, item := range list {
 		t := L.CreateTable(4, 0)
-		L.SetField(t, "key", lua.LString(key))
-		L.SetField(t, "value", lua.LString(item.ItemValue.Value))
-		L.SetField(t, "tags", stringMapsToTable(L, item.ItemValue.Tags))
-		L.SetField(t, "at", lua.LNumber(item.CreatedAt))
+		L.SetField(t, "metric", lua.LString(item.GetMetric()))
+		L.SetField(t, "value", lua.LString(item.GetValue()))
+		L.SetField(t, "tags", stringMapsToTable(L, item.GetTags()))
+		L.SetField(t, "at", lua.LNumber(item.GetCreatedAt()))
 		result.Append(t)
 	}
 	L.Push(result)

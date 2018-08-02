@@ -66,14 +66,14 @@ func ClientHandler(conn net.Conn) {
 	case request == protocol.LIST_OF_METRICS:
 		list := storage.Box.List()
 		stringList := []string{}
-		for key, item := range list {
+		for _, item := range list {
 			tagsArr := []string{}
-			if len(item.ItemValue.Tags) > 0 {
-				for k, v := range item.ItemValue.Tags {
+			if len(item.GetTags()) > 0 {
+				for k, v := range item.GetTags() {
 					tagsArr = append(tagsArr, fmt.Sprintf("%s=%s", k, v))
 				}
 			}
-			stringList = append(stringList, fmt.Sprintf("%s\t%s\t\t%s\t\t%d", key, strings.Join(tagsArr, " "), item.ItemValue.Value, item.CreatedAt))
+			stringList = append(stringList, fmt.Sprintf("%s\t%s\t\t%s\t\t%d", item.GetMetric(), strings.Join(tagsArr, " "), item.GetValue(), item.GetCreatedAt()))
 		}
 		sort.Strings(stringList)
 		response = strings.Join(stringList, "\n")
@@ -94,16 +94,14 @@ func ClientHandler(conn net.Conn) {
 				// key1=val2 key2=val2
 				for _, str := range data[1:] {
 					strData := strings.Split(str, "=")
-					if len(strData) != 2 {
-						response = protocol.COMMAND_ERROR
-					} else {
+					if len(strData) == 2 {
 						tags[strData[0]] = strData[1]
 					}
 				}
 			}
 			val, ok := storage.Box.Get(metric, tags)
 			if ok {
-				response = val.Value
+				response = val.GetValue()
 			} else {
 				response = protocol.UNKNOWN_METRIC
 			}

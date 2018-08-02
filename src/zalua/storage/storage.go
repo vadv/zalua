@@ -14,21 +14,6 @@ import (
 
 var Box = newStorage()
 
-type StorageItem struct {
-	ItemValue *StorageItemValue `json:"item_value"`
-	CreatedAt int64             `json:"created_at"`
-	TTL       int64             `json:"ttl"`
-}
-
-type StorageItemValue struct {
-	Value string            `json:"value"`
-	Tags  map[string]string `json:"tags"`
-}
-
-func (s *StorageItem) valid() bool {
-	return s.CreatedAt+s.TTL > time.Now().Unix()
-}
-
 type storage struct {
 	sync.Mutex
 	data map[string]*StorageItem
@@ -45,10 +30,6 @@ func newStorage() *storage {
 				for key, item := range list {
 					if !item.valid() {
 						delete(list, key)
-					}
-					// иногда у нас меняются форматы
-					if item.ItemValue == nil {
-						item.ItemValue = &StorageItemValue{Tags: make(map[string]string, 0)}
 					}
 				}
 				result.data = list
@@ -96,51 +77,37 @@ func (s *storage) saver() {
 }
 
 // установить значение по ключу с default TTL
-func (p *storage) Set(key, val string, tags map[string]string, ttl int64) {
+func (p *storage) Set(metric, val string, tags map[string]string, ttl int64) {
 	p.Lock()
 	defer p.Unlock()
 
-	metricKey := key
-	if len(tags) > 0 {
-		data, err := json.Marshal(&tags)
-		if err == nil {
-			metricKey = metricKey + string(data)
-		}
-	}
-
-	p.data[metricKey] = &StorageItem{
-		ItemValue: &StorageItemValue{
-			Value: val,
-			Tags:  tags,
-		},
+	item := &StorageItem{
+		Value:     val,
+		Tags:      tags,
+		Metric:    metric,
 		CreatedAt: time.Now().Unix(),
 		TTL:       ttl,
 	}
+	p.data[item.Key()] = item
 }
 
 // отдать значение по ключу
-func (p *storage) Get(key string, tags map[string]string) (*StorageItemValue, bool) {
+func (p *storage) Get(metric string, tags map[string]string) (*StorageItem, bool) {
 	p.Lock()
 	defer p.Unlock()
 
-	metricKey := key
-	if len(tags) > 0 {
-		data, err := json.Marshal(&tags)
-		if err == nil {
-			metricKey = metricKey + string(data)
-		}
-	}
+	metricKey := storageKey(metric, tags)
 
 	item := p.data[metricKey]
-	if item == nil || item.ItemValue == nil {
+	if item == nil {
 		return nil, false
 	}
 	if !item.valid() {
 		delete(p.data, metricKey)
-		return item.ItemValue, false
+		return item, false
 	}
 
-	return item.ItemValue, true
+	return item, true
 }
 
 // удалить значение по ключу
