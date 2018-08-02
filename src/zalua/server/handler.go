@@ -86,22 +86,19 @@ func ClientHandler(conn net.Conn) {
 
 	// get value of metric
 	case strings.HasPrefix(request, protocol.GET_METRIC_VALUE):
-		data := strings.Split(request, protocol.GET_METRIC_VALUE)
-		log.Printf(">>>request: '%v' data: '%v'\n", request, data)
+		data := strings.Split(request, " ")
 		if len(data) >= 2 {
 			metric := strings.Trim(data[1], " ")
 			tags := make(map[string]string, 0)
-			splitRequest := strings.Split(request, " ")
-			if len(splitRequest) > 3 {
+			if len(data) > 2 {
 				// key1=val2 key2=val2
-				for _, str := range splitRequest[2:] {
+				for _, str := range data[2:] {
 					strData := strings.Split(str, "=")
 					if len(strData) == 2 {
 						tags[strData[0]] = strData[1]
 					}
 				}
 			}
-			log.Printf(">>> TAGS: %v\n", tags)
 			val, ok := storage.Box.Get(metric, tags)
 			if ok {
 				response = val.GetValue()
