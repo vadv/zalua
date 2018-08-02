@@ -126,7 +126,7 @@ func main() {
 		msg = protocol.LIST_OF_METRICS
 
 	case "-g", "-get", "--get", "--get-metric", "get":
-		if len(os.Args) != 3 {
+		if len(os.Args) < 3 {
 			help()
 		}
 		msg = fmt.Sprintf("%s %s", protocol.GET_METRIC_VALUE, os.Args[2])
