@@ -67,7 +67,7 @@ func ClientHandler(conn net.Conn) {
 		list := storage.Box.List()
 		stringList := []string{}
 		for key, item := range list {
-			stringList = append(stringList, fmt.Sprintf("%s\t\t%s\t\t%d", key, item.Value, item.CreatedAt))
+			stringList = append(stringList, fmt.Sprintf("%s\t\t%s\t\t%d\t\t%v", key, item.ItemValue.Value, item.CreatedAt, item.ItemValue.Tags))
 		}
 		sort.Strings(stringList)
 		response = strings.Join(stringList, "\n")
@@ -81,10 +81,23 @@ func ClientHandler(conn net.Conn) {
 	// get value of metric
 	case strings.HasPrefix(request, protocol.GET_METRIC_VALUE):
 		data := strings.Split(request, protocol.GET_METRIC_VALUE)
-		if len(data) == 2 {
-			val, ok := storage.Box.Get(strings.Trim(data[1], " "))
+		if len(data) >= 2 {
+			metric := strings.Trim(data[1], " ")
+			tags := make(map[string]string, 0)
+			if len(data) > 2 {
+				// key1=val2 key2=val2
+				for _, str := range data[1:] {
+					strData := strings.Split(str, "=")
+					if len(strData) != 2 {
+						response = protocol.COMMAND_ERROR
+					} else {
+						tags[strData[0]] = strData[1]
+					}
+				}
+			}
+			val, ok := storage.Box.Get(metric, tags)
 			if ok {
-				response = val
+				response = val.Value
 			} else {
 				response = protocol.UNKNOWN_METRIC
 			}

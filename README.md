@@ -72,12 +72,12 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `p:was_stopped()` остановлен ли был плагин при помощи stop()
 
 * *metrics*:
-    * `metrics.set(key, val, <ttl>)` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
-    * `metrics.set_speed(key, val, <ttl>)` тоже самое, но считает скорость измерения
-    * `metrics.set_counter_speed(key, val, <ttl>)` тоже самое, но считает только положительную скорость измерения
-    * `metrics.get(key)` получить значение метрики key
-    * `metrics.list()` список `{key:"xxx", value:"xxx", at:xxx}`
-    * `metrics.delete(key)` удалить значение метрики key
+    * `metrics.set(key, val, [<ttl>, <tags>||<tags>, <ttl>])` установить значение метрики key, val может быть string, number. ttl по дефолту 300 секунд
+    * `metrics.set_speed(key, val, ...)` тоже самое, но считает скорость измерения
+    * `metrics.set_counter_speed(key, val, ...)` тоже самое, но считает только положительную скорость измерения
+    * `metrics.get(key, [<tags>])` получить значение метрики key
+    * `metrics.list()` список `{key:"xxx", value:"xxx", at:xxx, tags: {"k":"v"}}`
+    * `metrics.delete(key, [<tags>])` удалить значение метрики key
 
 * *postgres*:
     * `db, err = postgres.open({database="xxx", host="127.0.0.1", user="xxx", password="xxx"})` открыть коннект

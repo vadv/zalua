@@ -4,28 +4,12 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/go-goracle/goracle"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type oracleConn struct {
 	connString string
 	db         *sql.DB
-}
-
-func (o *oracleConn) connect() error {
-	if o.db == nil {
-		db, err := sql.Open("goracle", o.connString)
-		if err != nil {
-			return err
-		}
-		o.db = db
-	}
-	if err := o.db.Ping(); err != nil {
-		o.db = nil
-		return err
-	}
-	return nil
 }
 
 // создание коннекта

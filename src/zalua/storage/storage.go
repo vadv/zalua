@@ -15,9 +15,14 @@ import (
 var Box = newStorage()
 
 type StorageItem struct {
-	Value     string `json:"value"`
-	CreatedAt int64  `json:"created_at"`
-	TTL       int64  `json:"ttl"`
+	ItemValue *StorageItemValue `json:"item_value"`
+	CreatedAt int64             `json:"created_at"`
+	TTL       int64             `json:"ttl"`
+}
+
+type StorageItemValue struct {
+	Value string            `json:"value"`
+	Tags  map[string]string `json:"tags"`
 }
 
 func (s *StorageItem) valid() bool {
@@ -87,32 +92,51 @@ func (s *storage) saver() {
 }
 
 // установить значение по ключу с default TTL
-func (p *storage) Set(key, val string, ttl int64) {
+func (p *storage) Set(key, val string, tags map[string]string, ttl int64) {
 	p.Lock()
 	defer p.Unlock()
 
-	p.data[key] = &StorageItem{
-		Value:     val,
+	metricKey := key
+	if len(tags) > 0 {
+		data, err := json.Marshal(&tags)
+		if err == nil {
+			metricKey = metricKey + string(data)
+		}
+	}
+
+	p.data[metricKey] = &StorageItem{
+		ItemValue: &StorageItemValue{
+			Value: val,
+			Tags:  tags,
+		},
 		CreatedAt: time.Now().Unix(),
 		TTL:       ttl,
 	}
 }
 
 // отдать значение по ключу
-func (p *storage) Get(key string) (string, bool) {
+func (p *storage) Get(key string, tags map[string]string) (*StorageItemValue, bool) {
 	p.Lock()
 	defer p.Unlock()
 
-	item := p.data[key]
-	if item == nil {
-		return "", false
-	}
-	if !item.valid() {
-		delete(p.data, key)
-		return "", false
+	metricKey := key
+	if len(tags) > 0 {
+		data, err := json.Marshal(&tags)
+		if err == nil {
+			metricKey = metricKey + string(data)
+		}
 	}
 
-	return item.Value, true
+	item := p.data[metricKey]
+	if item == nil || item.ItemValue == nil {
+		return nil, false
+	}
+	if !item.valid() {
+		delete(p.data, metricKey)
+		return item.ItemValue, false
+	}
+
+	return item.ItemValue, true
 }
 
 // удалить значение по ключу

@@ -8,7 +8,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-func TestPlugin(t *testing.T) {
+func TestPluginStop(t *testing.T) {
 
 	testLua1 := `
 p = plugin.new("plugin_test.lua")
@@ -17,7 +17,7 @@ time.sleep(1)
 err = p:error(); if err then error(err) end
 
 p:stop() -- нужно проверить что плагин реально остановился
-time.sleep(1)
+time.sleep(2)
 err = p:error(); if err then error(err) end
 `
 
@@ -43,4 +43,20 @@ if not state then error("plugin must be stopped") end
 	if err := state.DoString(testLuas2); err != nil {
 		t.Fatalf("execute lua error: %s\n", err.Error())
 	}
+}
+
+func TestPluginMetricSet(t *testing.T) {
+	testLua := `
+local tags = {}
+tags["a"] = "a"
+
+metrics.set("x1", 10, 2, tags)
+metrics.set("x2", 10, tags, 2)
+`
+	state := lua.NewState()
+	Register(NewConfig(), state)
+	if err := state.DoString(testLua); err != nil {
+		t.Fatalf("execute lua error: %s\n", err.Error())
+	}
+
 }

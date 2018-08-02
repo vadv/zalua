@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"encoding/json"
 	"math"
 	"strconv"
 	"sync"
@@ -13,12 +14,24 @@ import (
 
 func (c *dslConfig) dslStorageGet(L *lua.LState) int {
 	key := L.CheckString(1)
-	if value, ok := storage.Box.Get(key); ok {
-		L.Push(lua.LString(value))
+	tags := make(map[string]string, 0)
+	if L.GetTop() > 1 {
+		tbl := L.CheckTable(2)
+		newTags, err := tblToStringMap(tbl)
+		if err != nil {
+			L.RaiseError("argument #2 must be table string:string")
+		}
+		tags = newTags
+	}
+
+	if value, ok := storage.Box.Get(key, tags); ok {
+		L.Push(lua.LString(value.Value))
+		L.Push(stringMapsToTable(L, value.Tags))
 	} else {
 		L.Push(lua.LNil)
+		L.Push(lua.LNil)
 	}
-	return 1
+	return 2
 }
 
 var speedCacheLastValue = make(map[string]float64, 0)
@@ -32,10 +45,8 @@ func setSpeed(L *lua.LState, counter bool) int {
 	metric := L.CheckString(1)
 	luaVal := L.CheckAny(2)
 	val := float64(0)
-	ttl := int64(300)
-	if L.GetTop() == 3 {
-		ttl = L.CheckInt64(3)
-	}
+	tags, ttl := getTagsTtlFromState(L)
+
 	// парсим как строку
 	if luaStr, ok := luaVal.(lua.LString); ok {
 		if floatVal, err := strconv.ParseFloat(string(luaStr), 64); err == nil {
@@ -50,8 +61,16 @@ func setSpeed(L *lua.LState, counter bool) int {
 		}
 	}
 
-	if lastValue, ok := speedCacheLastValue[metric]; ok {
-		if lastTime, ok := speedCacheLastTime[metric]; ok {
+	metricKey := metric
+	if len(tags) > 0 {
+		data, err := json.Marshal(&tags)
+		if err == nil {
+			metricKey = metricKey + string(data)
+		}
+	}
+
+	if lastValue, ok := speedCacheLastValue[metricKey]; ok {
+		if lastTime, ok := speedCacheLastTime[metricKey]; ok {
 			now := time.Now().UnixNano()
 			diff := float64(val - lastValue)
 			if counter && diff < 0 {
@@ -62,12 +81,12 @@ func setSpeed(L *lua.LState, counter bool) int {
 				if math.Abs(value) < 0.01 {
 					valueStr = strconv.FormatFloat(value, 'f', 4, 64)
 				}
-				storage.Box.Set(metric, valueStr, ttl)
+				storage.Box.Set(metric, valueStr, tags, ttl)
 			}
 		}
 	}
-	speedCacheLastValue[metric] = val
-	speedCacheLastTime[metric] = time.Now().UnixNano()
+	speedCacheLastValue[metricKey] = val
+	speedCacheLastTime[metricKey] = time.Now().UnixNano()
 
 	return 0
 }
@@ -97,11 +116,8 @@ func (c *dslConfig) dslStorageSet(L *lua.LState) int {
 			L.RaiseError("argument #2 must be string or number")
 		}
 	}
-	ttl := int64(300)
-	if L.GetTop() == 3 {
-		ttl = L.CheckInt64(3)
-	}
-	storage.Box.Set(key, val, ttl)
+	tags, ttl := getTagsTtlFromState(L)
+	storage.Box.Set(key, val, tags, ttl)
 	return 0
 }
 
@@ -109,9 +125,10 @@ func (c *dslConfig) dslStorageList(L *lua.LState) int {
 	list := storage.Box.List()
 	result := L.CreateTable(len(list), 0)
 	for key, item := range list {
-		t := L.CreateTable(3, 0)
+		t := L.CreateTable(4, 0)
 		L.SetField(t, "key", lua.LString(key))
-		L.SetField(t, "value", lua.LString(item.Value))
+		L.SetField(t, "value", lua.LString(item.ItemValue.Value))
+		L.SetField(t, "tags", stringMapsToTable(L, item.ItemValue.Tags))
 		L.SetField(t, "at", lua.LNumber(item.CreatedAt))
 		result.Append(t)
 	}
