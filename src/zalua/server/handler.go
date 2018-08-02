@@ -67,7 +67,13 @@ func ClientHandler(conn net.Conn) {
 		list := storage.Box.List()
 		stringList := []string{}
 		for key, item := range list {
-			stringList = append(stringList, fmt.Sprintf("%s\t\t%s\t\t%d\t\t%v", key, item.ItemValue.Value, item.CreatedAt, item.ItemValue.Tags))
+			tagsArr := []string{}
+			if len(item.ItemValue.Tags) > 0 {
+				for k, v := range item.ItemValue.Tags {
+					tagsArr = append(tagsArr, fmt.Sprintf("%s=%s", k, v))
+				}
+			}
+			stringList = append(stringList, fmt.Sprintf("%s\t%s\t\t%s\t\t%d", key, strings.Join(tagsArr, " "), item.ItemValue.Value, item.CreatedAt))
 		}
 		sort.Strings(stringList)
 		response = strings.Join(stringList, "\n")

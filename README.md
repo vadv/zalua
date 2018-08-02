@@ -53,6 +53,9 @@ runit.problem           Found problem with runit services: 'nginx' has linked, b
 
 $ zalua -g system.tcp.active
 0.00
+
+$ zalua -g system.disk.write_ops point=/video
+25.72
 ```
 
 ### Пример UserParameter:

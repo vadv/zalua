@@ -46,6 +46,10 @@ func newStorage() *storage {
 					if !item.valid() {
 						delete(list, key)
 					}
+					// иногда у нас меняются форматы
+					if item.ItemValue == nil {
+						item.ItemValue = &StorageItemValue{Tags: make(map[string]string, 0)}
+					}
 				}
 				result.data = list
 			} else {
