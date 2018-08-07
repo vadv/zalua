@@ -164,6 +164,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *tls_util*:
     * `tls_util.cert_not_after("server_name", ["server_name:443" || "address:port"])` возвращает unixts и ошибку
 
+* *human*:
+    * `human.time(int)` возвращает время в текстовом формате
+
 ## Примеры плагинов
 
 ### Diskstat

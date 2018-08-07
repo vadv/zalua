@@ -142,6 +142,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("tls_util", tlsUtil)
 	L.SetField(tlsUtil, "cert_not_after", L.NewFunction(config.dslTLSUtilCertGetNotAfter))
 
+	human := L.NewTypeMetatable("human")
+	L.SetGlobal("human", human)
+	L.SetField(human, "time", L.NewFunction(config.dslHumanizeTime))
+
 	goruntime := L.NewTypeMetatable("goruntime")
 	L.SetGlobal("goruntime", goruntime)
 	L.SetField(goruntime, "goarch", lua.LString(runtime.GOARCH))
