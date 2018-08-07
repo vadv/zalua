@@ -54,7 +54,7 @@ runit.problem           Found problem with runit services: 'nginx' has linked, b
 $ zalua -g system.tcp.active
 0.00
 
-$ zalua -g system.disk.write_ops point=/video
+$ zalua -g 'system.disk.write_ops point=/video'
 25.72
 ```
 
@@ -160,6 +160,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
 * *log*:
     * `log.error(msg)` сообщение в лог с уровнем error
     * `log.info(msg)` с уровнем info
+
+* *tls_util*:
+    * `tls_util.cert_not_after("server_name", ["server_name:443" || "address:port"])` возвращает unixts и ошибку
 
 ## Примеры плагинов
 

@@ -1,3 +1,5 @@
+if not goos.stat('/var/log/messages') then return end
+
 local syslog_layout = "Jan  2 15:04:05 2006"
 
 while true do

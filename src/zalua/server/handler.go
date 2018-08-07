@@ -64,16 +64,17 @@ func ClientHandler(conn net.Conn) {
 
 	// list of metrics
 	case request == protocol.LIST_OF_METRICS:
-		list := storage.Box.List()
 		stringList := []string{}
-		for _, item := range list {
+
+		for _, item := range storage.Box.List() {
 			tagsArr := []string{}
 			if len(item.GetTags()) > 0 {
 				for k, v := range item.GetTags() {
 					tagsArr = append(tagsArr, fmt.Sprintf("%s=%s", k, v))
 				}
 			}
-			stringList = append(stringList, fmt.Sprintf("%s\t%s\t\t%s\t\t%d", item.GetMetric(), strings.Join(tagsArr, " "), item.GetValue(), item.GetCreatedAt()))
+			str := fmt.Sprintf("%s\t%s\t\t%s\t\t%d", item.GetMetric(), strings.Join(tagsArr, " "), item.GetValue(), item.GetCreatedAt())
+			stringList = append(stringList, str)
 		}
 		sort.Strings(stringList)
 		response = strings.Join(stringList, "\n")

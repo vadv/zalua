@@ -1,3 +1,5 @@
+if not goos.stat('/proc/net/snmp') then return end
+
 -- парсит tcp строку из /proc/net/snmp
 function parse_tcp(str)
 

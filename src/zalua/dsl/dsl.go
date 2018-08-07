@@ -138,6 +138,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("cmd", cmd)
 	L.SetField(cmd, "exec", L.NewFunction(config.dslCmdExec))
 
+	tlsUtil := L.NewTypeMetatable("tls_util")
+	L.SetGlobal("tls_util", tlsUtil)
+	L.SetField(tlsUtil, "cert_not_after", L.NewFunction(config.dslTLSUtilCertGetNotAfter))
+
 	goruntime := L.NewTypeMetatable("goruntime")
 	L.SetGlobal("goruntime", goruntime)
 	L.SetField(goruntime, "goarch", lua.LString(runtime.GOARCH))
