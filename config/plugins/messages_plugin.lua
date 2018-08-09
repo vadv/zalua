@@ -5,7 +5,7 @@ local syslog_layout = "Jan  2 15:04:05 2006"
 while true do
 
   local min_time = os.time()-(24*60*60)
-  local count_oom, count_segfault = 0, 0
+  local count_oom, count_segfault, count_runit = 0, 0, 0
 
   local scanner = tac.open("/var/log/messages")
   while true do
@@ -20,12 +20,13 @@ while true do
     if err == nil then if log_time < min_time then break end end
     if string.find(line, "Out of memory: Kill process %d+ (%S+)") then count_oom = count_oom + 1 end
     if string.find(line, "kernel: (%S+)%[%d+%]: segfault at ") then count_segfault = count_segfault + 1 end
+    if string.find(line, "runit: service '%S+' exit code: '%d+'") then count_runit = count_runit + 1 end
   end
   scanner:close()
 
   local messages = "ok"
-  if count_oom + count_segfault > 0 then
-    messages = "Найдено проблем с OOM: " .. count_oom .. ", проблем с segfault: ".. count_segfault .." за последние 24 часов."
+  if count_oom + count_segfault + count_runit > 0 then
+    messages = "Найдено проблем с OOM: " .. count_oom .. ", проблем с segfault: ".. count_segfault ..", проблем с падением сервисов runit: ".. count_runit .." за последние 24 часов."
   end
   metrics.set("system.messages.problem", messages, 10*60)
 
