@@ -14,13 +14,14 @@ type pgsqlConn struct {
 	database string
 	user     string
 	passwd   string
+	sslmode  string
 	port     int
 	db       *sql.DB
 }
 
 func (p *pgsqlConn) connectionString() string {
-	return fmt.Sprintf("host='%s' port='%d' user='%s' dbname='%s' password='%s' sslmode='disable' fallback_application_name='zalua' connect_timeout='5'",
-		p.host, p.port, p.user, p.database, p.passwd)
+	return fmt.Sprintf("host='%s' port='%d' user='%s' dbname='%s' password='****' sslmode='%s' fallback_application_name='zalua' connect_timeout='5'",
+		p.host, p.port, p.user, p.database, p.sslmode)
 }
 
 func (p *pgsqlConn) connect() error {
@@ -63,6 +64,8 @@ func (c *dslConfig) dslNewPgsqlConn(L *lua.LState) int {
 				c.passwd = string(val)
 			case "db", "database":
 				c.database = string(val)
+			case "sslmode", "ssl":
+				c.sslmode = string(val)
 			default:
 				L.RaiseError("unknown option key: %s", key)
 			}
@@ -75,12 +78,14 @@ func (c *dslConfig) dslNewPgsqlConn(L *lua.LState) int {
 		user:     "postgres",
 		passwd:   "",
 		port:     5432,
+		sslmode:  "allow",
 	}
 	tbl := L.CheckTable(1)
 	setStringValue(conn, tbl, "host")
 	setStringValue(conn, tbl, "database")
 	setStringValue(conn, tbl, "user")
 	setStringValue(conn, tbl, "passwd")
+	setStringValue(conn, tbl, "sslmode")
 	luaPort := tbl.RawGetString("port")
 	if port, ok := luaPort.(lua.LNumber); ok {
 		conn.port = int(port)
