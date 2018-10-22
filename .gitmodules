@@ -13,6 +13,3 @@
 [submodule "src/gopkg.in/xmlpath.v2"]
 	path = src/gopkg.in/xmlpath.v2
 	url = https://gopkg.in/xmlpath.v2
-[submodule "src/github.com/pkg/errors"]
-	path = src/github.com/pkg/errors
-	url = https://github.com/pkg/errors.git
