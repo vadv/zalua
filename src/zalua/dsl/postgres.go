@@ -78,7 +78,7 @@ func (c *dslConfig) dslNewPgsqlConn(L *lua.LState) int {
 		user:     "postgres",
 		passwd:   "",
 		port:     5432,
-		sslmode:  "allow",
+		sslmode:  "disable",
 	}
 	tbl := L.CheckTable(1)
 	setStringValue(conn, tbl, "host")
