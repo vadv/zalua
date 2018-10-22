@@ -42,14 +42,6 @@ func Register(config *dslConfig, L *lua.LState) {
 		"query": config.dslPgsqlQuery,
 	}))
 
-	oracle := L.NewTypeMetatable("oracle")
-	L.SetGlobal("oracle", oracle)
-	L.SetField(oracle, "open", L.NewFunction(config.dslNewOracleConn))
-	L.SetField(oracle, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"close": config.dslOracleClose,
-		"query": config.dslOracleQuery,
-	}))
-
 	tcp := L.NewTypeMetatable("tcp")
 	L.SetGlobal("tcp", tcp)
 	L.SetField(tcp, "open", L.NewFunction(config.dslNewTCPConn))
@@ -150,4 +142,16 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetGlobal("goruntime", goruntime)
 	L.SetField(goruntime, "goarch", lua.LString(runtime.GOARCH))
 	L.SetField(goruntime, "goos", lua.LString(runtime.GOOS))
+
+	regexp := L.NewTypeMetatable("regexp")
+	L.SetGlobal("regexp", regexp)
+	L.SetField(regexp, "compile", L.NewFunction(config.dslRegexpCompile))
+	L.SetField(regexp, "match", L.NewFunction(config.dslRegexpIsMatch))
+	L.SetField(regexp, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+		"match":           config.dslRegexpMatch,
+		"find_all_string": config.dslRegexpFindAllString,
+		"find_all":        config.dslRegexpFindAllString,
+		"find_string":     config.dslRegexpFindString,
+		"find":            config.dslRegexpFindString,
+	}))
 }
