@@ -29,5 +29,11 @@ while true do
   metrics.set_counter_speed('pgbouncer.sent', total_sent)
   metrics.set_counter_speed('pgbouncer.received', total_received)
 
+  local rows, err = pgbouncer_db:query("show clients")
+  if err then pgbouncer_db:close(); error(err) end
+  local client_counts = 0
+  for _, row in pairs(rows) do client_counts = client_counts + 1 end
+  metrics.set('pgbouncer.clients.count', total_received)
+
   time.sleep(60)
 end
