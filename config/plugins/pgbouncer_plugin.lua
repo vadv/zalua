@@ -33,7 +33,7 @@ while true do
   if err then pgbouncer_db:close(); error(err) end
   local client_counts = 0
   for _, row in pairs(rows) do client_counts = client_counts + 1 end
-  metrics.set('pgbouncer.clients.count', total_received)
+  metrics.set('pgbouncer.clients.count', client_counts)
 
   time.sleep(60)
 end
