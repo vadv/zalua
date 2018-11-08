@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"log"
 	"net/http"
 
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
@@ -12,6 +13,7 @@ type prometheusSrv struct {
 }
 
 func (p *prometheusSrv) start(L *lua.LState) {
+	log.Printf("[INFO] start prometheus listener at %s\n", p.listenAddr)
 	http.Handle("/metrics", promhttp.Handler())
 	if err := http.ListenAndServe(p.listenAddr, nil); err != nil {
 		L.RaiseError("listen prometheus: %s", err.Error())

@@ -1,3 +1,6 @@
+package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
+sysinfo = require "sysinfo"
+
 -- обработка строки из /proc/stat
 function read_cpu_values(str)
   -- https://www.kernel.org/doc/Documentation/filesystems/proc.txt
@@ -16,7 +19,7 @@ gauge_cpu_usage = prometheus_gauge_vec.new({
   namespace = "system",
   subsystem = "cpu",
   name      = "usage",
-  vec       = { "cpu", "type" }
+  vec       = { "cpu", "type", "fqdn" }
 })
 
 -- главный loop
@@ -39,7 +42,7 @@ while true do
         metrics.set_counter_speed(storage_key, tonumber(value))
         -- берем подсчитанный из кэша
         local value = metrics.get(storage_key)
-        if value then gauge_cpu_usage:set({cpu = cpu_number, type = key}, tonumber(value)) end
+        if value then gauge_cpu_usage:set({cpu = cpu_number, type = key, fqdn = sysinfo.fqdn}, tonumber(value)) end
       end
     end
 

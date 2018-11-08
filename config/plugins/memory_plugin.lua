@@ -1,3 +1,6 @@
+package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
+sysinfo = require "sysinfo"
+
 function process(file)
   local result = {}
   for line in io.lines(file) do
@@ -14,7 +17,7 @@ gauge_memory = prometheus_gauge_vec.new({
   namespace = "system",
   subsystem = "memory",
   name      = "bytes",
-  vec       = { "type" }
+  vec       = { "type", "fqdn" }
 })
 
 
@@ -34,7 +37,7 @@ while true do
     elseif key == "Cached" then
       cached = val
     end
-    gauge_memory:set({ type = key }, val)
+    gauge_memory:set({ type = key, fqdn = sysinfo.fqdn }, val)
   end
   metrics.set("system.memory.free", tostring(free))
   metrics.set("system.memory.cached", tostring(cached))
