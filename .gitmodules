@@ -1,15 +1,36 @@
 [submodule "src/github.com/yuin/gopher-lua"]
-	path = src/github.com/yuin/gopher-lua
+	path = src/vendor/github.com/yuin/gopher-lua
 	url = https://github.com/yuin/gopher-lua.git
 [submodule "src/golang.org/x/net"]
-	path = src/golang.org/x/net
+	path = src/vendor/golang.org/x/net
 	url = https://go.googlesource.com/net
 [submodule "src/github.com/lib/pq"]
-	path = src/github.com/lib/pq
+	path = src/vendor/github.com/lib/pq
 	url = https://github.com/lib/pq.git
 [submodule "src/gopkg.in/yaml.v2"]
-	path = src/gopkg.in/yaml.v2
+	path = src/vendor/gopkg.in/yaml.v2
 	url = https://gopkg.in/yaml.v2
 [submodule "src/gopkg.in/xmlpath.v2"]
-	path = src/gopkg.in/xmlpath.v2
+	path = src/vendor/gopkg.in/xmlpath.v2
 	url = https://gopkg.in/xmlpath.v2
+[submodule "src/vendor/github.com/prometheus/client_golang"]
+	path = src/vendor/github.com/prometheus/client_golang
+	url = https://github.com/prometheus/client_golang.git
+[submodule "src/vendor/github.com/prometheus/procfs"]
+	path = src/vendor/github.com/prometheus/procfs
+	url = https://github.com/prometheus/procfs.git
+[submodule "src/vendor/github.com/beorn7/perks"]
+	path = src/vendor/github.com/beorn7/perks
+	url = https://github.com/beorn7/perks.git
+[submodule "src/vendor/github.com/golang/protobuf"]
+	path = src/vendor/github.com/golang/protobuf
+	url = https://github.com/golang/protobuf.git
+[submodule "src/vendor/github.com/prometheus/common"]
+	path = src/vendor/github.com/prometheus/common
+	url = https://github.com/prometheus/common.git
+[submodule "src/vendor/github.com/matttproud/golang_protobuf_extensions"]
+	path = src/vendor/github.com/matttproud/golang_protobuf_extensions
+	url = https://github.com/matttproud/golang_protobuf_extensions.git
+[submodule "src/vendor/github.com/prometheus/client_model"]
+	path = src/vendor/github.com/prometheus/client_model
+	url = https://github.com/prometheus/client_model.git

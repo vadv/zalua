@@ -4,6 +4,7 @@
 
 * легко расширяемый мониторинг написаный на скриптовом языке
 * использовать транспорт zabbix-agent
+* публиковать метрики для prometheus
 
 ## Решение:
 
@@ -81,6 +82,29 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `metrics.get(key, [<tags>])` получить значение метрики key
     * `metrics.list()` список `{key:"xxx", value:"xxx", at:xxx, tags: {"k":"v"}}`
     * `metrics.delete(key, [<tags>])` удалить значение метрики key
+
+* *prometheus*:
+    * `prometheus.listen(str)` разместить метрики для prometheus на указанном адресе
+
+* *prometheus_gauge*:
+    * `gauge = prometheus_gauge.new({help = "help..", name = "name..", "namespace" = "...", "subsystem" = "..."})` зарегистрировать gauge
+    * `gauge:add(number)`
+    * `gauge:set(number)`
+
+* *prometheus_gauge_vec*:
+    * `gauge, err = prometheus_gauge_vec.new({..., vec = {"vec1", "vec2"}})` зарегистрировать vector gauge, перерегистрация может вызвать ошибку если векторы не совпадают
+    * `gauge:add({vec1 = "value_vec_1", vec2 = "value_vec_2"}, number)`
+    * `gauge:set(...)`
+
+* *prometheus_counter*:
+    * `counter = prometheus_counter.new({help = "help..", name = "name..", "namespace" = "...", "subsystem" = "..."})` зарегистрировать counter
+    * `counter:inc()`
+    * `counter:add(number)`
+
+* *prometheus_counter_vec*:
+    * `counter, err = prometheus_counter_vec.new({..., vec = {"vec1", "vec2"}})` зарегистрировать vector counter, перерегистрация может вызвать ошибку если векторы не совпадают
+    * `counter:inc({vec1 = "value_vec_1", vec2 = "value_vec_2"})`
+    * `counter:add(..., number)`
 
 * *postgres*:
     * `db, err = postgres.open({database="xxx", host="127.0.0.1", user="xxx", password="xxx"})` открыть коннект
