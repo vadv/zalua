@@ -8,6 +8,16 @@ function process(file)
   return result
 end
 
+-- регистрируем prometheus метрики
+gauge_memory = prometheus_gauge_vec.new({
+  help     = "system memory discovery",
+  namespace = "system",
+  subsystem = "memory",
+  name      = "bytes",
+  vec       = { "type" }
+})
+
+
 -- основной loop
 while true do
   local row = process("/proc/meminfo")
@@ -24,6 +34,7 @@ while true do
     elseif key == "Cached" then
       cached = val
     end
+    gauge_memory:set({ type = key }, val)
   end
   metrics.set("system.memory.free", tostring(free))
   metrics.set("system.memory.cached", tostring(cached))

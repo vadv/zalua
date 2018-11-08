@@ -10,6 +10,15 @@ function read_cpu_values(str)
   return row
 end
 
+-- регистрируем prometheus метрики
+gauge_cpu_usage = prometheus_gauge_vec.new({
+  help     = "system cpu usage",
+  namespace = "system",
+  subsystem = "cpu",
+  name      = "usage",
+  vec       = { "cpu", "type" }
+})
+
 -- главный loop
 while true do
   local cpu_count = 0
@@ -19,6 +28,19 @@ while true do
     local number = line:match("^cpu(%d+)%s+.*")
     if number then
       number = tonumber(number) + 1; if number > cpu_count then cpu_count = number end
+    end
+
+    -- разбираем строчку которая начинается с ^(cpu%d+)
+    local cpu_number, cpu_number_line = line:match("^cpu(%d+) (.*)")
+    if cpu_number_line then
+      local cpu_number_values = read_cpu_values(cpu_number_line)
+      for key, value in pairs(cpu_number_values) do
+        local storage_key = "system.cpu."..cpu_number.."."..key
+        metrics.set_counter_speed(storage_key, tonumber(value))
+        -- берем подсчитанный из кэша
+        local value = metrics.get(storage_key)
+        if value then gauge_cpu_usage:set({cpu = cpu_number, type = key}, tonumber(value)) end
+      end
     end
 
     -- разбираем строчку которая начинается с ^(cpu )
