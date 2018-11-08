@@ -37,6 +37,8 @@ install -m 4777 bin/%{bin_name} %{buildroot}%{restream_zabbix_bin_dir}
 # plugins
 %{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins
 cp -v config/plugins/*.lua %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/
+%{__mkdir} -p %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/common
+cp -v config/plugins/common/*.lua %{buildroot}%{_sysconfdir}/%{bin_name}/plugins/common
 %{__install} -m 0644 config/init.lua %{buildroot}%{_sysconfdir}/%{bin_name}/init.lua
 # zabbix
 %{__mkdir} -p %{buildroot}/%{_sysconfdir}/zabbix/zabbix.d
@@ -49,7 +51,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{restream_zabbix_bin_dir}/%{bin_name}
 %{_sysconfdir}/%{bin_name}/init.lua
-%{_sysconfdir}/%{bin_name}/plugins/*
+%{_sysconfdir}/%{bin_name}/plugins
 %{_sysconfdir}/logrotate.d/%{bin_name}
 %{_sysconfdir}/zabbix/zabbix.d/%{bin_name}.conf
 %doc README.md
