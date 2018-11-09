@@ -31,7 +31,6 @@ total_expose = prometheus_gauge_vec.new({
 
 -- главный loop
 while true do
-  local cpu_count = 0
   for line in io.lines("/proc/mounts") do
 
     local data = strings.split(line, " ")
