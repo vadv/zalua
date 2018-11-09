@@ -170,6 +170,9 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `stat = goos.stat(filename)` goos.stat возвращает таблицу с полями `stat = {size, is_dir, mod_time}`, в случае ошибки возращает nil.
     * `goos.pagesize()` возвращет pagesize
 
+* *syscall*:
+    * `stat, err = syscall.statfs("/mount/point")` возвращает `stat = {size, free, avail, files, files_free}`
+
 * *time*:
     * `time.sleep(N)` проспать N секунд
     * `time.unix()` время в секундах

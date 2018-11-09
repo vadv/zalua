@@ -83,6 +83,10 @@ func Register(config *dslConfig, L *lua.LState) {
 	L.SetField(os, "stat", L.NewFunction(config.dslOsStat))
 	L.SetField(os, "pagesize", L.NewFunction(config.dslOsPagesize))
 
+	syscall := L.NewTypeMetatable("syscall")
+	L.SetGlobal("syscall", syscall)
+	L.SetField(syscall, "statfs", L.NewFunction(config.dslStatFs))
+
 	time := L.NewTypeMetatable("time")
 	L.SetGlobal("time", time)
 	L.SetField(time, "unix", L.NewFunction(config.dslTimeUnix))
