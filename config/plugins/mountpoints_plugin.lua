@@ -5,28 +5,28 @@ local ignore_fs = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|dev
 local ignore_mountpoints = "^/(dev|proc|sys|var/lib/docker/.+)($|/)"
 
 -- регистрируем prometheus метрики
-bytes_free = prometheus_gauge_vec.new({
+bytes_free = prometheus_gauge_labels.new({
   help     = "system filesystem percent free bytes",
   namespace = "system",
   subsystem = "disk",
   name      = "percent_bytes_free",
-  vec       = { "device", "mountpoint", "fs", "options", "fqdn" }
+  labels    = { "device", "mountpoint", "fs", "options", "fqdn" }
 })
 
-inodes_free = prometheus_gauge_vec.new({
+inodes_free = prometheus_gauge_labels.new({
   help     = "system filesystem percent free inodes",
   namespace = "system",
   subsystem = "disk",
   name      = "percent_inodes_free",
-  vec       = { "device", "mountpoint", "fs", "options", "fqdn" }
+  labels    = { "device", "mountpoint", "fs", "options", "fqdn" }
 })
 
-total_expose = prometheus_gauge_vec.new({
+total_expose = prometheus_gauge_labels.new({
   help     = "system filesystem expose",
   namespace = "system",
   subsystem = "disk",
   name      = "expose",
-  vec       = { "type", "device", "mountpoint", "fs", "options", "fqdn" }
+  labels    = { "type", "device", "mountpoint", "fs", "options", "fqdn" }
 })
 
 -- главный loop

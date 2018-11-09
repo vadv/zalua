@@ -171,10 +171,10 @@ func Register(config *dslConfig, L *lua.LState) {
 		"add": config.dslPrometheusCounterAdd,
 	}))
 
-	prometheus_counter_vec := L.NewTypeMetatable("prometheus_counter_vec")
-	L.SetGlobal("prometheus_counter_vec", prometheus_counter_vec)
-	L.SetField(prometheus_counter_vec, "new", L.NewFunction(config.dslNewPrometheusCounterVec))
-	L.SetField(prometheus_counter_vec, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+	prometheus_counter_lables := L.NewTypeMetatable("prometheus_counter_lables")
+	L.SetGlobal("prometheus_counter_lables", prometheus_counter_lables)
+	L.SetField(prometheus_counter_lables, "new", L.NewFunction(config.dslNewPrometheusCounterVec))
+	L.SetField(prometheus_counter_lables, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"inc": config.dslPrometheusCounterVecInc,
 		"add": config.dslPrometheusCounterVecAdd,
 	}))
@@ -187,10 +187,10 @@ func Register(config *dslConfig, L *lua.LState) {
 		"set": config.dslPrometheusGaugeSet,
 	}))
 
-	prometheus_gauge_vec := L.NewTypeMetatable("prometheus_gauge_vec")
-	L.SetGlobal("prometheus_gauge_vec", prometheus_gauge_vec)
-	L.SetField(prometheus_gauge_vec, "new", L.NewFunction(config.dslNewPrometheusGaugeVec))
-	L.SetField(prometheus_gauge_vec, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
+	prometheus_gauge_labels := L.NewTypeMetatable("prometheus_gauge_labels")
+	L.SetGlobal("prometheus_gauge_labels", prometheus_gauge_labels)
+	L.SetField(prometheus_gauge_labels, "new", L.NewFunction(config.dslNewPrometheusGaugeVec))
+	L.SetField(prometheus_gauge_labels, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
 		"add": config.dslPrometheusGaugeVecAdd,
 		"set": config.dslPrometheusGaugeVecSet,
 	}))

@@ -14,12 +14,12 @@ function read_cpu_values(str)
 end
 
 -- регистрируем prometheus метрики
-gauge_cpu_usage = prometheus_gauge_vec.new({
+gauge_cpu_usage = prometheus_gauge_labels.new({
   help     = "system cpu usage",
   namespace = "system",
   subsystem = "cpu",
   name      = "usage",
-  vec       = { "cpu", "type", "fqdn" }
+  labels    = { "cpu", "type", "fqdn" }
 })
 
 -- главный loop

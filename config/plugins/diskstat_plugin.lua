@@ -101,36 +101,36 @@ function calc_value(dev, values)
 end
 
 -- регистрируем prometheus метрики
-gauge_disk_bytes = prometheus_gauge_vec.new({
+gauge_disk_bytes = prometheus_gauge_labels.new({
   help     = "system disk usage in bytes",
   namespace = "system",
   subsystem = "disk",
   name      = "bytes",
-  vec       = { "mountpoint", "type", "fqdn" }
+  labels    = { "mountpoint", "type", "fqdn" }
 })
 
-gauge_disk_ops = prometheus_gauge_vec.new({
+gauge_disk_ops = prometheus_gauge_labels.new({
   help     = "system disk usage in ops",
   namespace = "system",
   subsystem = "disk",
   name      = "ops",
-  vec       = { "mountpoint", "type", "fqdn" }
+  labels    = { "mountpoint", "type", "fqdn" }
 })
 
-gauge_disk_utilization = prometheus_gauge_vec.new({
+gauge_disk_utilization = prometheus_gauge_labels.new({
   help     = "system disk utilization in percents",
   namespace = "system",
   subsystem = "disk",
   name      = "utilization",
-  vec       = { "mountpoint", "fqdn" }
+  labels    = { "mountpoint", "fqdn" }
 })
 
-gauge_disk_await = prometheus_gauge_vec.new({
+gauge_disk_await = prometheus_gauge_labels.new({
   help     = "system disk await in ms",
   namespace = "system",
   subsystem = "disk",
   name      = "await",
-  vec       = { "mountpoint", "fqdn" }
+  labels    = { "mountpoint", "fqdn" }
 })
 
 -- главный loop

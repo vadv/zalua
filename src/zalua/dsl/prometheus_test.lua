@@ -8,10 +8,10 @@ gauge_one:add(10)
 gauge_one:set(1)
 
 -- vector gauge
-gauge_vec_one, err = prometheus_gauge_vec.new({help = "this is help", name = "one_gauge_vec", vec = {"user"}})
+gauge_vec_one, err = prometheus_gauge_labels.new({help = "this is help", name = "one_gauge_vec", labels = {"user"}})
 if err then error(err) end
 
-gauge_vec_two, err = prometheus_gauge_vec.new({help = "this is help", name = "one_gauge_vec", vec = {"user"}})
+gauge_vec_two, err = prometheus_gauge_labels.new({help = "this is help", name = "one_gauge_vec", labels = {"user"}})
 if err then error(err) end
 
 gauge_vec_one:add({user = "user_1"}, 10)
@@ -32,10 +32,10 @@ counter_two:add(1000.2)
 
 
 -- vector counter
-counter_vec_one, err = prometheus_counter_vec.new({help = "this is help", name = "one_counter_vec", vec = {"user"}})
+counter_vec_one, err = prometheus_counter_lables.new({help = "this is help", name = "one_counter_vec", labels = {"user"}})
 if err then error(err) end
 
-counter_vec_two, err = prometheus_counter_vec.new({help = "this is help", name = "one_counter_vec", vec = {"user"}})
+counter_vec_two, err = prometheus_counter_lables.new({help = "this is help", name = "one_counter_vec", labels = {"user"}})
 if err then error(err) end
 
 counter_vec_one:add({user = "user_1"}, 10)

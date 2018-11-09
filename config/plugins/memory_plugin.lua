@@ -12,12 +12,12 @@ function process(file)
 end
 
 -- регистрируем prometheus метрики
-gauge_memory = prometheus_gauge_vec.new({
+gauge_memory = prometheus_gauge_labels.new({
   help     = "system memory discovery",
   namespace = "system",
   subsystem = "memory",
   name      = "bytes",
-  vec       = { "type", "fqdn" }
+  labels    = { "type", "fqdn" }
 })
 
 

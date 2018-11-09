@@ -2,12 +2,12 @@ package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package
 sysinfo = require "sysinfo"
 
 -- регистрируем prometheus метрики
-netstat = prometheus_gauge_vec.new({
+netstat = prometheus_gauge_labels.new({
   help     = "system tcp netstat",
   namespace = "system",
   subsystem = "tcp",
   name      = "netstat",
-  vec       = { "type", "fqdn" }
+  labels    = { "type", "fqdn" }
 })
 
 -- главный loop

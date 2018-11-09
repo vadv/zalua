@@ -13,12 +13,12 @@ for i,v in pairs(tcp_state_desc) do
 end
 
 -- регистрируем prometheus метрики
-tcp_state = prometheus_gauge_vec.new({
+tcp_state = prometheus_gauge_labels.new({
   help     = "system tcp state",
   namespace = "system",
   subsystem = "tcp",
   name      = "state",
-  vec       = { "type", "fqdn" }
+  labels    = { "type", "fqdn" }
 })
 
 -- главный loop

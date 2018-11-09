@@ -91,8 +91,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `gauge:add(number)`
     * `gauge:set(number)`
 
-* *prometheus_gauge_vec*:
-    * `gauge, err = prometheus_gauge_vec.new({..., vec = {"vec1", "vec2"}})` зарегистрировать vector gauge, перерегистрация может вызвать ошибку если векторы не совпадают
+* *prometheus_gauge_labels*:
+    * `gauge, err = prometheus_gauge_labels.new({..., labels = {"vec1", "vec2"}})` зарегистрировать vector gauge, перерегистрация может вызвать ошибку если векторы не совпадают
     * `gauge:add({vec1 = "value_vec_1", vec2 = "value_vec_2"}, number)`
     * `gauge:set(...)`
 
@@ -101,8 +101,8 @@ UserParameter=disk.utilization[*], /usr/bin/zalua -g system.disk.$1.utilization
     * `counter:inc()`
     * `counter:add(number)`
 
-* *prometheus_counter_vec*:
-    * `counter, err = prometheus_counter_vec.new({..., vec = {"vec1", "vec2"}})` зарегистрировать vector counter, перерегистрация может вызвать ошибку если векторы не совпадают
+* *prometheus_counter_lables*:
+    * `counter, err = prometheus_counter_lables.new({..., labels = {"vec1", "vec2"}})` зарегистрировать vector counter, перерегистрация может вызвать ошибку если векторы не совпадают
     * `counter:inc({vec1 = "value_vec_1", vec2 = "value_vec_2"})`
     * `counter:add(..., number)`
 

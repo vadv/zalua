@@ -18,7 +18,7 @@ type dslPrometheusCounterVec struct {
 func (c *dslConfig) dslNewPrometheusCounterVec(L *lua.LState) int {
 
 	config := L.CheckTable(1)
-	vec := config.RawGetString(`vec`)
+	vec := config.RawGetString(`labels`)
 	vectors, err := luaTblToSlice(vec)
 	if err != nil {
 		L.Push(lua.LNil)
@@ -44,7 +44,7 @@ func (c *dslConfig) dslNewPrometheusCounterVec(L *lua.LState) int {
 		gauge := ud.Value.(*dslPrometheusCounterVec)
 		if strings.Join(gauge.vectors, "_") != strings.Join(vectors, "_") {
 			L.Push(lua.LNil)
-			L.Push(lua.LString("can't change vectors online"))
+			L.Push(lua.LString("can't change labels online"))
 			return 2
 		}
 		L.Push(ud)
@@ -64,7 +64,7 @@ func (c *dslConfig) dslNewPrometheusCounterVec(L *lua.LState) int {
 	}
 	ud := L.NewUserData()
 	ud.Value = &dslPrometheusCounterVec{counter: counter, vectors: vectors}
-	L.SetMetatable(ud, L.GetTypeMetatable("prometheus_counter_vec"))
+	L.SetMetatable(ud, L.GetTypeMetatable("prometheus_counter_lables"))
 	L.Push(ud)
 	regPrometheusCounterVecUserData[fullName] = ud
 	return 1
@@ -75,7 +75,7 @@ func checkPrometheusCounterVec(L *lua.LState) *dslPrometheusCounterVec {
 	if v, ok := ud.Value.(*dslPrometheusCounterVec); ok {
 		return v
 	}
-	L.ArgError(1, "prometheus_counter_vec expected")
+	L.ArgError(1, "prometheus_counter_lables expected")
 	return nil
 }
 

@@ -11,12 +11,12 @@ for _, direction in pairs(directions) do
 end
 
 -- регистрируем prometheus метрики
-gauge_net = prometheus_gauge_vec.new({
+gauge_net = prometheus_gauge_labels.new({
   help     = "system net info",
   namespace = "system",
   subsystem = "net",
   name      = "info",
-  vec       = { "type", "direction", "fqdn", "interface" }
+  labels    = { "type", "direction", "fqdn", "interface" }
 })
 
 -- обработка строки из /proc/net/dev без ethX:
