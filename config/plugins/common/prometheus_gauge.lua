@@ -32,11 +32,15 @@ function prom_gauge:set(value, labels)
   self.prometheus:set(real_labels, value)
 end
 
-function prom_gauge:set_from_metrics(labels, key)
+function prom_gauge:set_from_metrics(key, labels)
   -- немного удобства
-  if not(type(labels) == "table") then labels, key = key, labels end
+  if not(type(key) == "string") then labels, key = key, labels end
   local value = metrics.get(key) -- nil or string
-  if value then self:set(labels, tonumber(value)) end
+  if not value then return end
+  -- установка значения
+  local real_labels = labels or {}
+  for k,v in pairs(self.additional_labels) do real_labels[k] = v end
+  self.prometheus:set(real_labels, tonumber(value))
 end
 
 return prom_gauge
