@@ -5,7 +5,7 @@ local ignore_fs = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|dev
 local ignore_mountpoints = "^/(dev|proc|sys|var/lib/docker/.+)($|/)"
 
 -- регистрируем prometheus метрики
-bytes_free = guage.new({
+bytes_free = guage:new({
   help     = "system filesystem percent free bytes",
   namespace = "system",
   subsystem = "disk",
@@ -13,7 +13,7 @@ bytes_free = guage.new({
   labels    = { "device", "mountpoint", "fs" }
 })
 
-inodes_free = guage.new({
+inodes_free = guage:new({
   help     = "system filesystem percent free inodes",
   namespace = "system",
   subsystem = "disk",
@@ -21,7 +21,7 @@ inodes_free = guage.new({
   labels    = { "device", "mountpoint", "fs" }
 })
 
-total_expose = guage.new({
+total_expose = guage:new({
   help     = "system filesystem expose",
   namespace = "system",
   subsystem = "disk",

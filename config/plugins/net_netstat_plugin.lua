@@ -2,7 +2,7 @@ package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package
 guage = require "prometheus_gauge"
 
 -- регистрируем prometheus метрики
-netstat = guage.new({
+netstat = guage:new({
   help="system tcp netstat", namespace="system", subsystem="tcp",
   name="netstat", labels={"type"}
 })
@@ -22,7 +22,7 @@ while true do
     if not(k == "TcpExt:") then
       local zabbix_key = "system.tcp.netstat["..k.."]"
       metrics.set_counter_speed(zabbix_key, v)
-      netstat:set(zabbix_key, {type=k})
+      netstat:set_from_metrics(zabbix_key, {type=k})
     end
   end
 

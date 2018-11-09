@@ -202,8 +202,8 @@ while true do
     gauge_disk_await:set_from_metrics("system.disk.await["..mountpoint.."]", {mountpoint = mountpoint})
     gauge_disk_bytes:set_from_metrics("system.disk.read_bytes_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "read"})
     gauge_disk_bytes:set_from_metrics("system.disk.write_bytes_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "write"})
-    gauge_disk_ops:set_from_metrics("system.disk.read_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "read"}) end
-    gauge_disk_ops:set_from_metrics("system.disk.write_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "write"}) end
+    gauge_disk_ops:set_from_metrics("system.disk.read_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "read"})
+    gauge_disk_ops:set_from_metrics("system.disk.write_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "write"})
 
   end
 

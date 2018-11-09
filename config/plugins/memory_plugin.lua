@@ -12,7 +12,7 @@ function process(file)
 end
 
 -- регистрируем prometheus метрики
-gauge_memory = guage.new({
+gauge_memory = guage:new({
   help     = "system memory discovery",
   namespace = "system",
   subsystem = "memory",

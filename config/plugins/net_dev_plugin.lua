@@ -11,7 +11,7 @@ for _, direction in pairs(directions) do
 end
 
 -- регистрируем prometheus метрики
-gauge_net = guage.new({
+gauge_net = guage:new({
   help     = "system net info",
   namespace = "system",
   subsystem = "net",
@@ -41,7 +41,7 @@ while true do
           local key = direction.."."..t
           local value = proc_net_field_value(row)
           metrics.set_speed("system.net."..key.."["..interface.."]", value[key])
-          gauge_net:set_from_metrics("system.net."..key.."["..interface.."]", {direction = direction, type = t, interface = interface}
+          gauge_net:set_from_metrics("system.net."..key.."["..interface.."]", {direction = direction, type = t, interface = interface})
         end
       end
     end

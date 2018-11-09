@@ -13,7 +13,7 @@ for i,v in pairs(tcp_state_desc) do
 end
 
 -- регистрируем prometheus метрики
-tcp_state = guage.new({
+tcp_state = guage:new({
   help     = "system tcp state",
   namespace = "system",
   subsystem = "tcp",
