@@ -1,13 +1,10 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 -- регистрируем prometheus метрики
-netstat = prometheus_gauge_labels.new({
-  help     = "system tcp netstat",
-  namespace = "system",
-  subsystem = "tcp",
-  name      = "netstat",
-  labels    = { "type", "fqdn" }
+netstat = guage.new({
+  help="system tcp netstat", namespace="system", subsystem="tcp",
+  name="netstat", labels={"type"}
 })
 
 -- главный loop
@@ -25,8 +22,7 @@ while true do
     if not(k == "TcpExt:") then
       local zabbix_key = "system.tcp.netstat["..k.."]"
       metrics.set_counter_speed(zabbix_key, v)
-      local value = metrics.get(zabbix_key)
-      if value then netstat:set({type=k, fqdn=sysinfo.fqdn}, tonumber(value)) end
+      netstat:set(zabbix_key, {type=k})
     end
   end
 

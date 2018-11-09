@@ -1,5 +1,5 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 function process(file)
   local result = {}
@@ -12,12 +12,12 @@ function process(file)
 end
 
 -- регистрируем prometheus метрики
-gauge_memory = prometheus_gauge_labels.new({
+gauge_memory = guage.new({
   help     = "system memory discovery",
   namespace = "system",
   subsystem = "memory",
   name      = "bytes",
-  labels    = { "type", "fqdn" }
+  labels    = {"type"}
 })
 
 
@@ -37,7 +37,7 @@ while true do
     elseif key == "Cached" then
       cached = val
     end
-    gauge_memory:set({ type = key, fqdn = sysinfo.fqdn }, val)
+    gauge_memory:set({type = key}, val)
   end
   metrics.set("system.memory.free", tostring(free))
   metrics.set("system.memory.cached", tostring(cached))

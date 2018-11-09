@@ -1,5 +1,5 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 local tcp_state_desc = {
   "established", "syn_sent", "syn_recv", "fin_wait1", "fin_wait2", "time_wait", "close",
@@ -13,12 +13,12 @@ for i,v in pairs(tcp_state_desc) do
 end
 
 -- регистрируем prometheus метрики
-tcp_state = prometheus_gauge_labels.new({
+tcp_state = guage.new({
   help     = "system tcp state",
   namespace = "system",
   subsystem = "tcp",
   name      = "state",
-  labels    = { "type", "fqdn" }
+  labels    = {"type"}
 })
 
 -- главный loop
@@ -32,7 +32,7 @@ while true do
 
   for k, v in pairs(result) do
     local t = tcp_state_map[k]
-    tcp_state:set({fqdn=sysinfo.fqdn, type=t}, v)
+    tcp_state:set(v, {type=t})
   end
 
   time.sleep(60)

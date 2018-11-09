@@ -1,5 +1,5 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 directions = {"rx", "tx"}
 types = {"bytes", "packets", "errs", "drop", "fifo", "frame", "compressed", "multicast"}
@@ -11,12 +11,12 @@ for _, direction in pairs(directions) do
 end
 
 -- регистрируем prometheus метрики
-gauge_net = prometheus_gauge_labels.new({
+gauge_net = guage.new({
   help     = "system net info",
   namespace = "system",
   subsystem = "net",
   name      = "info",
-  labels    = { "type", "direction", "fqdn", "interface" }
+  labels    = { "direction", "fqdn", "interface" }
 })
 
 -- обработка строки из /proc/net/dev без ethX:
@@ -41,8 +41,7 @@ while true do
           local key = direction.."."..t
           local value = proc_net_field_value(row)
           metrics.set_speed("system.net."..key.."["..interface.."]", value[key])
-          local value = metrics.get("system.net."..key.."["..interface.."]")
-          if value then gauge_net:set({fqdn = sysinfo.fqdn, direction = direction, type = t, interface = interface}, tonumber(value)) end
+          gauge_net:set_from_metrics("system.net."..key.."["..interface.."]", {direction = direction, type = t, interface = interface}
         end
       end
     end

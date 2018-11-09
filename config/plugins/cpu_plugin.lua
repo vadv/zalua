@@ -1,5 +1,5 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 -- обработка строки из /proc/stat
 function read_cpu_values(str)
@@ -14,12 +14,12 @@ function read_cpu_values(str)
 end
 
 -- регистрируем prometheus метрики
-gauge_cpu_usage = prometheus_gauge_labels.new({
+gauge_cpu_usage = guage:new({
   help     = "system cpu usage",
   namespace = "system",
   subsystem = "cpu",
   name      = "usage",
-  labels    = { "cpu", "type", "fqdn" }
+  labels    = { "cpu", "type" }
 })
 
 -- главный loop
@@ -42,7 +42,7 @@ while true do
         metrics.set_counter_speed(storage_key, tonumber(value))
         -- берем подсчитанный из кэша
         local value = metrics.get(storage_key)
-        if value then gauge_cpu_usage:set({cpu = cpu_number, type = key, fqdn = sysinfo.fqdn}, tonumber(value)) end
+        if value then gauge_cpu_usage:set(tonumber(value), {cpu = cpu_number, type = key}) end
       end
     end
 

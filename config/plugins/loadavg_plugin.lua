@@ -1,36 +1,33 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 -- регистрируем prometheus метрики
-la1 = prometheus_gauge_labels.new({
+la1 = guage:new({
   help     = "system loadavg 1m",
   namespace = "system",
   subsystem = "cpu",
-  name      = "la_1m",
-  labels    = { "fqdn" }
+  name      = "la_1m"
 })
 
-la5 = prometheus_gauge_labels.new({
+la5 = guage:new({
   help     = "system loadavg 5m",
   namespace = "system",
   subsystem = "cpu",
-  name      = "la_5m",
-  labels    = { "fqdn" }
+  name      = "la_5m"
 })
 
-la15 = prometheus_gauge_labels.new({
+la15 = guage:new({
   help     = "system loadavg 15m",
   namespace = "system",
   subsystem = "cpu",
-  name      = "la_15m",
-  labels    = { "fqdn" }
+  name      = "la_15m"
 })
 
 while true do
   local line = strings.trim(ioutil.readfile("/proc/loadavg"), "\n")
   local data = strings.split(line, " ")
-  la1:set({fqdn=sysinfo.fqdn}, tonumber(data[1]))
-  la5:set({fqdn=sysinfo.fqdn}, tonumber(data[2]))
-  la15:set({fqdn=sysinfo.fqdn}, tonumber(data[3]))
+  la1:set(tonumber(data[1]))
+  la5:set(tonumber(data[2]))
+  la15:set(tonumber(data[3]))
   time.sleep(60)
 end

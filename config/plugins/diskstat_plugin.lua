@@ -1,5 +1,5 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
-sysinfo = require "sysinfo"
+guage = require "prometheus_gauge"
 
 -- парсит содержимое /proc/diskstats
 function diskstat()
@@ -101,36 +101,36 @@ function calc_value(dev, values)
 end
 
 -- регистрируем prometheus метрики
-gauge_disk_bytes = prometheus_gauge_labels.new({
+gauge_disk_bytes = guage:new({
   help     = "system disk usage in bytes",
   namespace = "system",
   subsystem = "disk",
   name      = "bytes",
-  labels    = { "mountpoint", "type", "fqdn" }
+  labels    = { "mountpoint", "type" }
 })
 
-gauge_disk_ops = prometheus_gauge_labels.new({
+gauge_disk_ops = guage:new({
   help     = "system disk usage in ops",
   namespace = "system",
   subsystem = "disk",
   name      = "ops",
-  labels    = { "mountpoint", "type", "fqdn" }
+  labels    = { "mountpoint", "type" }
 })
 
-gauge_disk_utilization = prometheus_gauge_labels.new({
+gauge_disk_utilization = guage:new({
   help     = "system disk utilization in percents",
   namespace = "system",
   subsystem = "disk",
   name      = "utilization",
-  labels    = { "mountpoint", "fqdn" }
+  labels    = { "mountpoint" }
 })
 
-gauge_disk_await = prometheus_gauge_labels.new({
+gauge_disk_await = guage:new({
   help     = "system disk await in ms",
   namespace = "system",
   subsystem = "disk",
   name      = "await",
-  labels    = { "mountpoint", "fqdn" }
+  labels    = { "mountpoint" }
 })
 
 -- главный loop
@@ -198,23 +198,12 @@ while true do
     metrics.set_counter_speed("system.disk.all_ops_in_sec["..mountpoint.."]", all_stats[dev]["read_ops"] + all_stats[dev]["write_ops"])
 
     -- prometheus
-    local value = metrics.get("system.disk.utilization["..mountpoint.."]")
-    if value then gauge_disk_utilization:set({mountpoint = mountpoint, fqdn = sysinfo.fqdn}, tonumber(value)) end
-
-    local value = metrics.get("system.disk.await["..mountpoint.."]")
-    if value then gauge_disk_await:set({mountpoint = mountpoint, fqdn = sysinfo.fqdn}, tonumber(value)) end
-
-    local value = metrics.get("system.disk.read_bytes_in_sec["..mountpoint.."]")
-    if value then gauge_disk_bytes:set({mountpoint = mountpoint, type = "read", fqdn = sysinfo.fqdn}, tonumber(value)) end
-
-    local value = metrics.get("system.disk.write_bytes_in_sec["..mountpoint.."]")
-    if value then gauge_disk_bytes:set({mountpoint = mountpoint, type = "write", fqdn = sysinfo.fqdn}, tonumber(value)) end
-
-    local value = metrics.get("system.disk.read_ops_in_sec["..mountpoint.."]")
-    if value then gauge_disk_ops:set({mountpoint = mountpoint, type = "read", fqdn = sysinfo.fqdn}, tonumber(value)) end
-
-    local value = metrics.get("system.disk.write_ops_in_sec["..mountpoint.."]")
-    if value then gauge_disk_ops:set({mountpoint = mountpoint, type = "write", fqdn = sysinfo.fqdn}, tonumber(value)) end
+    gauge_disk_utilization:set_from_metrics("system.disk.utilization["..mountpoint.."]", {mountpoint = mountpoint})
+    gauge_disk_await:set_from_metrics("system.disk.await["..mountpoint.."]", {mountpoint = mountpoint})
+    gauge_disk_bytes:set_from_metrics("system.disk.read_bytes_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "read"})
+    gauge_disk_bytes:set_from_metrics("system.disk.write_bytes_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "write"})
+    gauge_disk_ops:set_from_metrics("system.disk.read_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "read"}) end
+    gauge_disk_ops:set_from_metrics("system.disk.write_ops_in_sec["..mountpoint.."]", {mountpoint = mountpoint, type = "write"}) end
 
   end
 
