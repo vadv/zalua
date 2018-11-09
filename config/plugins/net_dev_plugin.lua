@@ -16,7 +16,7 @@ gauge_net = guage:new({
   namespace = "system",
   subsystem = "net",
   name      = "info",
-  labels    = { "direction", "fqdn", "interface" }
+  labels    = { "direction", "interface", "type" }
 })
 
 -- обработка строки из /proc/net/dev без ethX:
