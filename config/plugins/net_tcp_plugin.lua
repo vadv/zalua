@@ -1,39 +1,33 @@
 package.path = filepath.dir(debug.getinfo(1).source)..'/common/?.lua;'.. package.path
 guage = require "prometheus_gauge"
 
-local tcp_state_desc = {
-  "established", "syn_sent", "syn_recv", "fin_wait1", "fin_wait2", "time_wait", "close",
-  "close_wait", "last_ack", "listen", "closing"
-}
-
-local tcp_state_map = {}
-for i,v in pairs(tcp_state_desc) do
-  k = string.format("%02X", i)
-  tcp_state_map[k] = v
+function read_ss()
+  local state, err = cmd.exec("/usr/sbin/ss --summary")
+  if err == nil then
+    -- команда не завершилась с ошибкой
+    if not(state == nil) then
+      -- есть stdout/stderr
+      local result = {}
+      for _, line in pairs(strings.split(state.stdout, "\n")) do
+        if line:match("^TCP: ") then
+          result["established"] = tonumber(line:match("estab (%d+),"))
+          result["closed"] = tonumber(line:match("closed (%d+),"))
+          result["orphaned"] = tonumber(line:match("orphaned (%d+),"))
+          result["synrecv"] = tonumber(line:match("synrecv (%d+),"))
+          local tw1, tw2 = line:match("timewait (%d+)/(%d+)")
+          result["timewait"] = tonumber(tw1) + tonumber(tw2)
+          return result
+        end
+      end
+    end
+  end
 end
 
--- регистрируем prometheus метрики
-tcp_state = guage:new({
-  help     = "system tcp state",
-  namespace = "system",
-  subsystem = "tcp",
-  name      = "state",
-  labels    = {"type"}
-})
+tcp_state = guage:new({ name = "system_tcp_state", labels = {"type"} })
 
 -- главный loop
 while true do
-
-  local result = {}; for k, _ in pairs(tcp_state_map) do result[k] = 0 end
-  for line in io.lines("/proc/net/tcp") do
-    local data = strings.split(line, " "); local state = data[5]
-    if state and not(result[state] == nil) then result[state] = result[state] + 1 end
-  end
-
-  for k, v in pairs(result) do
-    local t = tcp_state_map[k]
-    tcp_state:set(v, {type=t})
-  end
-
+  local result = read_ss()
+  if result then for k, v in pairs(result) do tcp_state:set({type=k}, v) end end
   time.sleep(60)
 end
